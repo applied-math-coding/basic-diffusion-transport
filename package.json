@@ -1,10 +1,10 @@
 {
-  "name": "home",
+  "name": "basic-diffusion-transport",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --ssl=true",
-    "build": "ng build --prod --output-path docs --base-href /home/",
+    "build": "ng build --prod --output-path docs --base-href /basic-diffusion-transport/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
