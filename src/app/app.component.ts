@@ -16,6 +16,11 @@ export class AppComponent implements OnInit {
   }
 
   handleStartSimulation() {
-
+    const worker = new Worker('./app.worker', { type: 'module' });
+    worker.onmessage = ({ data }) => {
+      console.log(`page got message: ${data}`);
+    };
+    worker.postMessage('hello');
   }
 }
+

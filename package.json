@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --ssl=true",
-    "build": "ng build --prod --output-path docs --base-href /basic-diffusion-transport/",
+    "build": "ng build --prod --base-href /basic-diffusion-transport/",
+    "deploy": "ng build --prod --output-path docs --base-href /basic-diffusion-transport/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
