@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { mat } from 'lina';
 
 @Component({
   selector: 'app-root',
@@ -10,8 +9,7 @@ export class AppComponent implements OnInit {
   title = 'basic-diffusion-transport';
 
   ngOnInit() {
-    const A = mat(2, 2).fill(7);
-    A.print();
+    //TODO implement simulation to be interruptable (see js concept)
     //TODO  run simulation in webworker and message in reg. timesteps the main to rerender data
   }
 
