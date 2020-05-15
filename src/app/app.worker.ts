@@ -17,7 +17,8 @@ const rho = 1.225; // kg/m^3 density
 const c_p = 1004; // J/(kg*K) heat-capacity
 const T_c = 273.15; // K  cold-temp
 const T_h = T_c + 20; // K hot-temp
-const v = 0.05; // m/s
+const v_x = 0.05; // m/s
+const v_y = 0; // m/s
 const v_max = 2; // m/s^2 max. abs. velocity
 const duration = 5 * 60; // s duration
 const report_frequ = 1; // s
@@ -39,13 +40,13 @@ function diffusion_y_op(w: Matrix): Matrix {
 
 function convection_x_op(w: Matrix): Matrix {
   const u = w.shrink(1);
-  calc<Matrix>`${u} = ${u} -  ${v * delta_t / delta_x} % (${u} - ${u.shift_x(-1)})`;
+  calc<Matrix>`${u} = ${u} -  ${v_x * delta_t / delta_x} * (${u} - ${u.shift_x(-1)})`;
   return w;
 }
 
 function convection_y_op(w: Matrix): Matrix {
   const u = w.shrink(1);
-  calc<Matrix>`${u} = ${u} -  ${v * delta_t / delta_x} % (${u} - ${u.shift_y(-1)})`;
+  calc<Matrix>`${u} = ${u} -  ${v_y * delta_t / delta_x} * (${u} - ${u.shift_y(-1)})`;
   return w;
 }
 
