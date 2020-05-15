@@ -10,15 +10,15 @@ addEventListener('message', ({ data }) => {
 //TODO implement parts so that they can be reused in a PDE-package
 // TODO remove this and implement a partial  op(partial(f)(a))   f(a, ...)
 const L = 1; // m (the length of the block)
-const n_grid = 10;
+const n_grid = 50;
 const delta_x = L / n_grid; // m
 const lambda = 0.026; // J/(m*s*K) heat conductivity TODO
 const rho = 1.225; // kg/m^3 density
 const c_p = 1004; // J/(kg*K) heat-capacity
 const T_c = 273.15; // K  cold-temp
 const T_h = T_c + 20; // K hot-temp
-const v_x = 0.05; // m/s
-const v_y = 0; // m/s
+const v_x = 0; // m/s
+const v_y = 0.05; // m/s
 const v_max = 2; // m/s^2 max. abs. velocity
 const duration = 5 * 60; // s duration
 const report_frequ = 1; // s
@@ -52,11 +52,10 @@ function convection_y_op(w: Matrix): Matrix {
 
 function adjust_boundary(u: Matrix): Matrix {
   const [rows, cols] = u.shape();
-  // fixed upper, lower boundary
-  const upper_and_lower = ({ row }) => row === 0 || row === rows - 1;
-  u.filter(upper_and_lower).fill(T_h);
-
-  // no-gradient condition at left and right
+  // fixed temp at lower boundary
+  u.filter(({ row }) => row === 0).fill(T_h);
+  // no-gradient condition at left, right and top
+  calc`${u.row(rows - 1)} = ${u.row(rows - 2)}`;
   calc`${u.col(0)} = ${u.col(1)}`;
   calc`${u.col(cols - 1)} = ${u.col(cols - 2)}`;
   return u;

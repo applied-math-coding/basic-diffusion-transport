@@ -32,6 +32,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
 
+    //TODO cope for possible negative velocity
+    //TODO make v_y = 0 at bottom-border
+    //TODO change v_y by using a buoyancy effect and use some random param inside
+
     //TODO create PDE and Functional libs
     //TODO incorporate params and show sliders and input fields to adjust values
 
