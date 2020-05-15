@@ -18,7 +18,7 @@ const c_p = 1004; // J/(kg*K) heat-capacity
 const T_c = 273.15; // K  cold-temp
 const T_h = T_c + 20; // K hot-temp
 const v_max = 2; // m/s^2 max. abs. velocity
-const duration = 5*60; // s duration
+const duration = 5 * 60; // s duration
 const report_frequ = 1; // s
 
 const alpha = lambda / (rho * c_p);
@@ -43,8 +43,8 @@ function adjust_boundary(u: Matrix): Matrix {
   u.filter(upper_and_lower).fill(T_h);
 
   // no-gradient condition at left and right
-  calc`${u.slice(0, 0, rows - 1, 0)} = ${u.slice(0, 1, rows - 1, 1)}`;
-  calc`${u.slice(0, cols - 1, rows - 1, cols - 1)} = ${u.slice(0, cols - 2, rows - 1, cols - 2)}`;
+  calc`${u.col(0)} = ${u.col(1)}`;
+  calc`${u.col(cols - 1)} = ${u.col(cols - 2)}`;
   return u;
 }
 
@@ -58,7 +58,7 @@ function simulate(params: Params) {
       .comp(adjust_boundary)(u);
 
     if (!last_report || t - last_report >= report_frequ) {
-      postMessage(u.rawData());
+      postMessage({ T: u.rawData(), t });
       last_report = t;
     }
   }

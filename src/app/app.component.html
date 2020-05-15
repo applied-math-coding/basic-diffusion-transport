@@ -1,5 +1,15 @@
-<button pButton type="button" label="Start Simulation" (click)="handleStartSimulation()"></button>
+<div class="header-bar">
+  <button pButton type="button" label="Start Simulation" class="ui-button-success"
+    (click)="handleStartSimulation()"></button>
+  <button pButton type="button" label="Stop Simulation" class="ui-button-danger"
+    (click)="handleStopSimulation()"></button>
+  <div class="lapsed-time" *ngIf="currData?.t">
+    Lapsed time: {{currData.t}} secs
+  </div>
+</div>
 
-<plotly-plot [data]="graph.data" [layout]="graph.layout"></plotly-plot>
+
+<plotly-plot *ngIf="currData" [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
+
 
 <router-outlet></router-outlet>
