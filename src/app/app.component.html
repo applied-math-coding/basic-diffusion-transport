@@ -3,9 +3,14 @@
     (click)="handleStartSimulation()"></button>
   <button pButton type="button" label="Stop Simulation" class="ui-button-danger"
     (click)="handleStopSimulation()"></button>
-  <div class="lapsed-time" *ngIf="currData?.t">
-    Lapsed time: {{currData.t}} secs
-  </div>
+  <ng-container *ngIf="currData">
+    <div class="elapsed-time">
+      Elapsed time: <span class="primary-label">{{currData.t}}s</span>
+    </div>
+    <div>
+      Max. delta-t: <span class="secondary-label">{{currData.delta_t}}s</span>
+    </div>
+  </ng-container>
 </div>
 
 

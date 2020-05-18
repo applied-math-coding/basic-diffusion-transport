@@ -13,12 +13,15 @@ export class AppComponent implements OnInit {
   graph = {
     data: [{
       z: [],
-      type: 'heatmap'
+      type: 'heatmap',
+      // colorscale: [[0, 'rgb(0,0,255)'], [1, 'rgb(255,0,0)']],
+      zmin: 273,  //TODO adjust to param
+      zmax: 279
     }],
     layout: {
       width: 600,
-      height: 600,
-      margin: { l: 50, r: 50, t: 20, b: 20 },
+      height: 300,
+      margin: { l: 50, r: 50, t: 20, b: 30 },
       xaxis: { rangemode: 'nonnegative' }
     },
     config: {
@@ -32,6 +35,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
 
+    //TODO keep the heatmap scale fixed
     //TODO cope for possible negative velocity
     //TODO make v_y = 0 at bottom-border
     //TODO change v_y by using a buoyancy effect and use some random param inside
