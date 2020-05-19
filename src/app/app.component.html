@@ -1,20 +1,59 @@
 <div class="header-bar">
-  <button pButton type="button" label="Start Simulation" class="ui-button-success"
-    (click)="handleStartSimulation()"></button>
-  <button pButton type="button" label="Stop Simulation" class="ui-button-danger"
-    (click)="handleStopSimulation()"></button>
-  <ng-container *ngIf="currData">
-    <div class="elapsed-time">
-      Elapsed time: <span class="primary-label">{{currData.t}}s</span>
-    </div>
-    <div>
-      Max. dt: <span class="primary-label">{{currData.delta_t}}s</span>
-    </div>
-  </ng-container>
+  <div class="font-large title">Heat Diffusion Transport</div>
+  <div class="buttons">
+    <button pButton type="button" label="Start Simulation" class="ui-button-success"
+      (click)="handleStartSimulation()"></button>
+    <button pButton type="button" label="Stop Simulation" class="ui-button-danger"
+      (click)="handleStopSimulation()"></button>
+  </div>
 </div>
 
+<div class="params-settings">
+  <div class="filter-item">
+    <div class="filter-label">Number of grid-points:</div>
+    <p-dropdown [options]="gridOptions" [(ngModel)]="params.n_grid"></p-dropdown>
+  </div>
+  <div class="filter-item">
+    <div class="filter-label">Low Temperature (K):</div>
+    <p-spinner [(ngModel)]="params.T_c" [max]="params.T_h" [step]="0.01"></p-spinner>
+  </div>
+  <div class="filter-item">
+    <div class="filter-label">High Temperatur (K):</div>
+    <p-spinner [(ngModel)]="params.T_h" [min]="params.T_c" [step]="0.01"></p-spinner>
+  </div>
+  <div class="filter-item">
+    <div class="filter-label">Thermal Conductivity (J/(m*s*K)):</div>
+    <p-spinner [(ngModel)]="params.lambda" [step]="0.001"></p-spinner>
+  </div>
+  <div class="filter-item">
+    <div class="filter-label">Density (kg/m^3):</div>
+    <p-spinner [(ngModel)]="params.rho" [step]="0.001"></p-spinner>
+  </div>
+  <div class="filter-item">
+    <div class="filter-label">Heat Capacity (J/(kg*K)):</div>
+    <p-spinner [(ngModel)]="params.c_p" [step]="1"></p-spinner>
+  </div>
+  <div class="filter-item">
+    <div class="filter-label">Include Buoyancy</div>
+    <p-checkbox [(ngModel)]="params.includeBuoyancy" [binary]="true"></p-checkbox>
+  </div>
+</div>
+<div class="params-note">Simulation is tested with parameter reflecting conditions of air around 280K.</div>
+<div class="divider"></div>
+<div class="simulation-result">
+  <plotly-plot *ngIf="currData" [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
+  <div *ngIf="currData" class="dynamic-var-container">
+    <div class="dynamic-var">
+      <div>Elapsed time:</div>
+      <div class="dynamic-var-value">{{currData.t}}s</div>
+    </div>
+    <div class="dynamic-var">
+      <div>Max. dt:</div>
+      <div class="dynamic-var-value max-dt">{{currData.delta_t | round:10000}}s</div>
+    </div>
+  </div>
+</div>
 
-<plotly-plot *ngIf="currData" [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
 
 
 <router-outlet></router-outlet>

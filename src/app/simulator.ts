@@ -4,32 +4,35 @@ import { Params } from './params';
 
 export class Simulator {
   private readonly L = 1; // m (the length of the block)
-  private readonly n_grid = 50;
-  private readonly delta_x = this.L / this.n_grid; // m
   private readonly g = 9.81; // m/s^2
-  private readonly v_max = 2; // m/s^2 max. abs. velocity  //TODO make this adaptive
   private readonly duration = 5 * 60; // s duration
   private readonly report_frequ = 1; // s
+  private v_max = 2; // m/s^2 max. abs. velocity
   private alpha: number;
   private delta_t: number;
   private params: Params;
+  private delta_x: number;
 
   constructor(params: Params) {
     this.params = params;
+    this.delta_x = this.L / this.params.n_grid;
     this.alpha = this.params.lambda / (this.params.rho * this.params.c_p);
-    this.delta_t = Math.min(1 / 4 * this.delta_x ** 2 / this.alpha, this.delta_x / this.v_max);
+    this.delta_t = this.calc_min_delta_t();
   }
 
   simulate() {
-    const T = mat(this.n_grid - 2, this.n_grid - 2).wrap(1).fill(this.params.T_c); // initial conditions
-    const v_y = zeros(this.n_grid, this.n_grid);
-    const v_x = zeros(this.n_grid, this.n_grid);
+    console.log('Simulation starting with params:');
+    console.log(JSON.stringify(this.params));
+    const T = mat(this.params.n_grid - 2, this.params.n_grid - 2).wrap(1).fill(this.params.T_c); // initial conditions
+    const v_y = zeros(this.params.n_grid, this.params.n_grid);
+    const v_x = zeros(this.params.n_grid, this.params.n_grid);
 
     let last_report: number;
     for (let t = 0; t <= this.duration; t = t + this.delta_t) {
       op(d => d)
         .comp((d: DynamicVars) => this.adjust_boundary(d))
-        .comp((d: DynamicVars) => this.mom_convection_y_op(d))
+        .comp((d: DynamicVars) => this.time_adaptive_op(d))
+        .comp((d: DynamicVars) => this.params.includeBuoyancy ? this.mom_convection_y_op(d) : d)
         .comp((d: DynamicVars) => this.heat_convection_y_op(d))
         .comp((d: DynamicVars) => this.diffusion_y_op(d))
         .comp((d: DynamicVars) => this.diffusion_x_op(d))
@@ -40,6 +43,16 @@ export class Simulator {
         last_report = t;
       }
     }
+  }
+
+  private time_adaptive_op(d: DynamicVars): DynamicVars {
+    this.v_max = calc<Matrix>`abs(${d.v_y})`.max();
+    this.delta_t = this.calc_min_delta_t();
+    return d;
+  }
+
+  private calc_min_delta_t(): number {
+    return Math.min(1, 1 / 4 * this.delta_x ** 2 / this.alpha, this.delta_x / this.v_max);
   }
 
   private diffusion_x_op(d: DynamicVars): DynamicVars {
@@ -90,18 +103,11 @@ export class Simulator {
     calc`${v_y.row(rows - 1)} = ${v_y.row(rows - 2)}`;
     calc`${v_y.col(0)} = ${v_y.col(1)}`;
     calc`${v_y.col(cols - 1)} = ${v_y.col(cols - 2)}`;
-    // calc`${v_y.row(0)} = 0`; TODO correct this at line
-    v_y.row(0).fill(0); //TODO remove later
+    calc`${v_y.row(0)} = 0`;
     return d;
   }
 }
 
-//TODO implement parts so that they can be reused in a PDE-package
-// TODO remove this and implement a partial  op(partial(f)(a))   f(a, ...)
-
-//TODO put this into a lib (either PDE lib or functional.lib) what more concepts? memoize, curry, partial, ...
-// chain/pipe (would be reverse of comp)  In(x).appl(f).appl(g) ...
-// PDE lib can utilize the operator splitting approach and providing different stable schema for different approxim
 type Fn<T, R> = (v: T) => R;
 type Op<T, R> = Fn<T, R> & { comp: <S>(g: Fn<S, T>) => Op<S, R> };
 export function op<T = any, R = any>(f: Fn<T, R>): Op<T, R> {
