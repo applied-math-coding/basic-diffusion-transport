@@ -1,0 +1,61 @@
+\documentclass[]{article}
+
+%opening
+\title{Implementing of a simple Heat-Convection-Diffusion Model}
+\author{Florian Nikos Kitzka}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The aim of this document is to provide a simple guide how to create and implement a model for a heat-convection-diffusion problem. Our approach is to start from underlying physics to pose the model-equations and then to explain difficulties arising during implementation.
+The full implemented result is provided by an external link, which deems to encourage the reader to extend and play with given implementation.
+We assume basic knowledge of Analysis and Linear Algebra as well as some understanding of 
+fluid dynamics. Chapters are written quite independent of each other so that the reader
+can skip parts in which no interest exist. 
+\end{abstract}
+
+\section{Simulation Target}
+We consider a room of cubical shape.\\
+We assume all walls except the bottom to allow transfer of air (open walls).\\
+The bottom is assumed to be heated by the sun-light through radiation.\\
+Our goal is to simulate how this heat is being transferred through the room over time.
+TODO picture
+
+\section{Creation of Model}
+There are two main mechanism of heat transfer in nature. One is diffusion the other is convection.
+
+\section{Numerical Scheme}
+In order to solve the model equation we are going to use the so called
+Finite Difference Method.
+
+\subsection{Derivative Approximations}
+
+\subsection{Stability}
+One of the most important things concerning numerical solution of approximation
+schemes is to ensure stability.
+Actually one could argue that since we have justified all our derivative approximations by Taylor-expansions we are ready and can blindly implement the discrete equations into 
+a computer-system. This approach though turns out too naive. Remember that any computer system always produces rounding errors. Although these errors are very small they can
+sum-up drastically when we have to repeat calculations very often.
+Our scheme is of the form 
+\begin{equation}
+u_{n+1}=A(u_{n})
+\end{equation}
+where $A$ is some linear function. 
+
+ 
+
+\subsection{Operator and Term Splitting}
+
+\subsection{Final Schema}
+
+\section{Implementation}
+
+\section{Further Reading}
+This article intends to give an introduction into all treated areas.
+There are many good books or only tutorials about numerical treatment of partial
+differential equations. Or if you are more specialized on fluid dynamics you will
+many good accounts on this field too. In case your are more interested in the 
+implementation side, be encouraged to clone the entire project from https://github.com/applied-math-coding/basic-diffusion-transport and to extend or play around.
+\end{document}

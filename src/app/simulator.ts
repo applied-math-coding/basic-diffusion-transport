@@ -1,6 +1,7 @@
 import { calc, Matrix, zeros, mat } from 'lina';
 import { DynamicVars } from './dynamic-vars';
 import { Params } from './params';
+import { op } from '@applied.math.coding/functional';
 
 export class Simulator {
   private readonly L = 1; // m (the length of the block)
@@ -29,7 +30,7 @@ export class Simulator {
 
     let last_report: number;
     for (let t = 0; t <= this.duration; t = t + this.delta_t) {
-      op(d => d)
+      op((d: DynamicVars) => d)
         .comp((d: DynamicVars) => this.adjust_boundary(d))
         .comp((d: DynamicVars) => this.time_adaptive_op(d))
         .comp((d: DynamicVars) => this.params.includeBuoyancy ? this.mom_convection_y_op(d) : d)
@@ -108,10 +109,4 @@ export class Simulator {
   }
 }
 
-type Fn<T, R> = (v: T) => R;
-type Op<T, R> = Fn<T, R> & { comp: <S>(g: Fn<S, T>) => Op<S, R> };
-export function op<T = any, R = any>(f: Fn<T, R>): Op<T, R> {
-  const res = (v: T) => f(v);
-  res['comp'] = <S>(g: Fn<S, T>) => op((v: S) => f(g(v)));
-  return res;
-}
+
