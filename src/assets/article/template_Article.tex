@@ -18,6 +18,8 @@ Fluid Dynamics. Chapters are written quite independent of each other so that the
 can skip parts in which no interest exist. 
 \end{abstract}
 
+\tableofcontents
+
 \section{Simulation Target}
 We consider a room of cubical shape.\\
 We assume all walls except the bottom to allow transfer of air (open walls).\\
@@ -40,9 +42,53 @@ In order to solve the model equations (\ref{model_equations}) numerically we are
 \subsection{Derivative Approximations}
 The main method to obtain such approximations for derivatives is using Taylor expansion.
 We give a detailed description for one specific derivative expression but leave the remaining for the reader since they are produced in analogy.\\
+Also, for reasons becoming clear later, we restrict our attention to 1-dimensional functions.
+Consider the two Taylor expansions,
+\begin{equation*}
+u(x+h)=u(x)+u'(x)h+\frac{1}{2}u''(x)h^2+o(2)
+\end{equation*}
+\begin{equation*}
+u(x-h)=u(x)-u'(x)h+\frac{1}{2}u''(x)h^2+o(2)
+\end{equation*}
+By adding both equations we obtain
+\begin{equation*}
+u(x+h)+u(x-h)=2u(x)+u''(x)h^2
+\end{equation*}
+By solving the later for $u''(x)$ we get a second-order approximation for the second derivative
+of $u$.
+\begin{equation*} 
+u''(x)=\frac{1}{h^2}(u(x+h)+u(x-h)-2u(x)) + o(2)
+\end{equation*}
 
+For the numerical treatment we have to consider $u$ discrete in space and time.
+We define 
+\begin{equation*}
+u_{i}^{n}=u(t_{n}, x_{i})
+\end{equation*}
+or in case of 2-dimensions
+\begin{equation*}
+u_{i,j}^{n}=u(t_{n}, x_{i}, y_{j})
+\end{equation*}
 
-//TODO
+With this we can now easily list the approximations we are going to use, especially the one
+we just obtained for second-order derivatives.
+
+\begin{eqnarray}
+	\left[\frac{\partial u}{\partial t}\right]_{i}^{n} & \approx \frac{1}{\Delta t}(u_{i}^{n+1}-u_{i}^{n}) \nonumber  \\
+	\left[\frac{\partial u}{\partial x}\right]_{i}^{n} & \approx \frac{1}{\Delta x}(u_{i}^{n}-u_{i-1}^{n})  \label{backward_in_space} \\
+	\left[\frac{\partial u}{\partial x}\right]_{i}^{n} & \approx \frac{1}{\Delta x}(u_{i+1}^{n}-u_{i}^{n}) \label{forward_in_space}  \\
+	\left[\frac{\partial^2 u}{\partial x^2}\right]_{i}^{n} & \approx
+	\frac{1}{\Delta x^2}(u_{i-1}^{n}-2u_{i}^{n}+u_{i+1}^{n}) \nonumber
+\end{eqnarray}
+
+For first derivative we have provided two approximations, (\ref{forward_in_space}) is called
+forward in space and (\ref{backward_in_space}) is called backward in space.
+
+Note, we only present a small selection of possible ways to approximate derivatives. Also, since this article deems as an introduction we only focused on explicit schemes, but the reader should be aware there exists another important category of so called implicit schemes.
+For a more comprehensive list and treatment the reader is referred to standard literature of finite difference method.
+
+\subsection{Advection Scheme}
+//TODO describe which term in model equiation this is refering to
 
 The following scheme is used for advection with positive velocity ($c>0$)
 \begin{equation} \label{advection_scheme_upwind}
@@ -56,6 +102,9 @@ u_{i}^{n+1}=u_{i}^{n}-c\frac{\Delta t}{\Delta x} (u_{i+1}^{n}-u_{i-1}^{n})
 
 The reason for splitting the scheme based on the direction of velocity becomes clear in chapter \ref{stability}.
 
+//TODO describe which term in model equiation this is refering to
+
+\subsection{Diffusion Scheme}
 For diffusion we use the scheme
 \begin{equation} \label{diffusion_scheme}
 u_{i}^{n+1}=u_{i}^ {n}+\alpha\frac{\Delta t}{\Delta x^{2}} (u_{i-1}^{n}-2u_{i}^{n}+u_{i+1}^{n})
@@ -104,6 +153,7 @@ The idea behind this is to assume the errors can be approximated (or estimated) 
 \epsilon(t,x)=e^{at}\sum_{k}e^{ikx}
 \end{equation}
 In other words, some function which decreases or increases exponentially in time. Having any concrete scheme $A$, we can use above representation of $\epsilon(t,x)$ and use this in (\ref{error_scheme}). Also since $A$ is linear it is enough to restrict attention to a specific $k$ of the expansion.
+
 //TODO show advection and diffusion scheme is stable
  
 
@@ -111,12 +161,20 @@ In other words, some function which decreases or increases exponentially in time
 You might have wondered that our approximation schemes all were targeted at 1-dimensional problems, but our model is formulated in two dimensions. In turns out that by an elegant trick
 we actually only need the 1-dimensional approximations.
 
+//TODO give exemplary proof of one split case
+
 \subsection{Final Scheme}
+
+//TODO
 
 \section{Implementation}
 You can find all code here \\ \url{https://github.com/applied-math-coding/basic-diffusion-transport} \\ and
 a running example here \\
  \url{https://applied-math-coding.github.io/basic-diffusion-transport/}.
+
+//TODO
+descirbe the usfulness of op-splitting in implementation
+descr use of matrix-slides and functional-progr
 
 \section{Further Reading}
 This article intends to give an introduction into all treated areas.

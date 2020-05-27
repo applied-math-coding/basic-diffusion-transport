@@ -2,8 +2,10 @@
 \BOOKMARK [1][-]{section.2}{Creation of Model}{}% 2
 \BOOKMARK [1][-]{section.3}{Numerical Scheme}{}% 3
 \BOOKMARK [2][-]{subsection.3.1}{Derivative Approximations}{section.3}% 4
-\BOOKMARK [2][-]{subsection.3.2}{Stability}{section.3}% 5
-\BOOKMARK [2][-]{subsection.3.3}{Operator and Term Splitting}{section.3}% 6
-\BOOKMARK [2][-]{subsection.3.4}{Final Scheme}{section.3}% 7
-\BOOKMARK [1][-]{section.4}{Implementation}{}% 8
-\BOOKMARK [1][-]{section.5}{Further Reading}{}% 9
+\BOOKMARK [2][-]{subsection.3.2}{Advection Scheme}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Diffusion Scheme}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.4}{Stability}{section.3}% 7
+\BOOKMARK [2][-]{subsection.3.5}{Operator and Term Splitting}{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.6}{Final Scheme}{section.3}% 9
+\BOOKMARK [1][-]{section.4}{Implementation}{}% 10
+\BOOKMARK [1][-]{section.5}{Further Reading}{}% 11
