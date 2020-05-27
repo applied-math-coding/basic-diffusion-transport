@@ -1,7 +1,9 @@
 \documentclass[]{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
 
 %opening
-\title{Implementing of a simple Heat-Convection-Diffusion Model}
+\title{Implementing of a simple Heat-Convection Model}
 \author{Florian Nikos Kitzka}
 
 \begin{document}
@@ -9,10 +11,10 @@
 \maketitle
 
 \begin{abstract}
-The aim of this document is to provide a simple guide how to create and implement a model for a heat-convection-diffusion problem. Our approach is to start from underlying physics to pose the model-equations and then to explain difficulties arising during implementation.
+The aim of this document is to provide a simple guide how to create and implement a model for a heat-convection problem. Our approach is to start from underlying physics to pose the model-equations and then to explain difficulties arising during implementation.
 The full implemented result is provided by an external link, which deems to encourage the reader to extend and play with given implementation.
 We assume basic knowledge of Analysis and Linear Algebra as well as some understanding of 
-fluid dynamics. Chapters are written quite independent of each other so that the reader
+Fluid Dynamics. Chapters are written quite independent of each other so that the reader
 can skip parts in which no interest exist. 
 \end{abstract}
 
@@ -24,38 +26,103 @@ Our goal is to simulate how this heat is being transferred through the room over
 TODO picture
 
 \section{Creation of Model}
-There are two main mechanism of heat transfer in nature. One is diffusion the other is convection.
+There are two main mechanism of heat transfer in nature. One is diffusion the other is advection.
+
+
+\begin{align} 
+\frac{\partial T}{\partial t}&=-\textbf{v}\cdot \nabla T + \frac{k}{\rho\alpha}\Delta T \label{model_equations} \\
+\frac{\partial v_{z}}{\partial t}&=g\frac{T-T_{A}}{T_{A}}-v_{z}\frac{\partial v_{z}}{\partial z} \nonumber
+\end{align}
 
 \section{Numerical Scheme}
-In order to solve the model equation we are going to use the so called
-Finite Difference Method.
+In order to solve the model equations (\ref{model_equations}) numerically we are going to use the so called Finite Difference Method. This requires to lay a fixed grid over our domain (the room) and replace all derivative expressions by discrete approximations.
 
 \subsection{Derivative Approximations}
+The main method to obtain such approximations for derivatives is using Taylor expansion.
+We give a detailed description for one specific derivative expression but leave the remaining for the reader since they are produced in analogy.\\
 
-\subsection{Stability}
-One of the most important things concerning numerical solution of approximation
+
+//TODO
+
+The following scheme is used for advection with positive velocity ($c>0$)
+\begin{equation} \label{advection_scheme_upwind}
+u_{i}^{n+1}=u_{i}^{n}-c\frac{\Delta t}{\Delta x} (u_{i}^{n}-u_{i-1}^{n})
+\end{equation}
+
+and for negative velocity we use
+\begin{equation} \label{advection_scheme_downwind}
+u_{i}^{n+1}=u_{i}^{n}-c\frac{\Delta t}{\Delta x} (u_{i+1}^{n}-u_{i-1}^{n})
+\end{equation}
+
+The reason for splitting the scheme based on the direction of velocity becomes clear in chapter \ref{stability}.
+
+For diffusion we use the scheme
+\begin{equation} \label{diffusion_scheme}
+u_{i}^{n+1}=u_{i}^ {n}+\alpha\frac{\Delta t}{\Delta x^{2}} (u_{i-1}^{n}-2u_{i}^{n}+u_{i+1}^{n})
+\end{equation}
+
+\subsection{Stability} \label{stability}
+One of the most important things with the use of approximation
 schemes is to ensure stability.
 Actually one could argue that since we have justified all our derivative approximations by Taylor-expansions we are ready and can blindly implement the discrete equations into 
-a computer-system. This approach though turns out too naive. Remember that any computer system always produces rounding errors. Although these errors are very small they can
-sum-up drastically when we have to repeat calculations very often.
-Our scheme is of the form 
-\begin{equation}
+a computer-system. This approach turns out to be too naive.\\
+In general each computation is accompanied with rounding errors. Although these can be very small they can sum-up drastically when we have to repeat calculations iterative.
+Our scheme has the form 
+\begin{equation} \label{stability_scheme}
 u_{n+1}=A(u_{n})
 \end{equation}
-where $A$ is some linear function. 
-
+where $A$ is some linear function. \\
+If we assume the $u_{n}$'s to be computed without rounding errors (hypothetically), and our 
+'realistic' calculated values are $\tilde{u}_{n}$ then we have
+\begin{equation}
+\tilde{u}_{n}=u_{n}+\epsilon_{n}
+\end{equation}
+where $\epsilon_{n}$ denotes the deviation of step $n$.
+Therefore instead of (\ref{stability_scheme}) we actually deal with
+\begin{equation} \label{deviated_scheme}
+u_{n+1}+\epsilon_{n+1}=A(u_{n}+\epsilon_{n})
+\end{equation}
+We observe, at step $n$ we obtained a deviated solution which we use to compute step $n+1$.
+Thus at step $n+1$ we are faced to the rounding error made in this step and the fact that we
+were actually using the deviated solution, $u_{n}+\epsilon_{n}$, as input.
+So the very important question arises: How does the $\epsilon_{n}$'s evolve over time?\\
+Combining equations (\ref{stability_scheme}), (\ref{deviated_scheme}) and using linearity of $A$ we obtain
+\begin{equation} \label{error_scheme}
+\epsilon_{n+1}=A(\epsilon_{n})
+\end{equation}
+This gives us a direct relation between errors at different steps.
+The striking idea is to formulate a scheme, that is choose $A$, so that for all $n$
+\begin{equation} \label{scheme_error}
+|\epsilon_{n+1}| \leq |\epsilon_{n} |
+\end{equation}
+Note, if above equation holds, then we can be sure that although we still have to face 
+rounding errors, the fact that we use a deviated version, $u_{n}+\epsilon_{n}$, as input in
+step $n+1$ does not impact the overall outcome of the iteration.\\
+In order to show a given scheme to fulfill (\ref{scheme_error}) we use a method invented by John von Neumann.\\
+The idea behind this is to assume the errors can be approximated (or estimated) by a Fourier-expansion
+\begin{equation} \label{error_fourier_exp}
+\epsilon(t,x)=e^{at}\sum_{k}e^{ikx}
+\end{equation}
+In other words, some function which decreases or increases exponentially in time. Having any concrete scheme $A$, we can use above representation of $\epsilon(t,x)$ and use this in (\ref{error_scheme}). Also since $A$ is linear it is enough to restrict attention to a specific $k$ of the expansion.
+//TODO show advection and diffusion scheme is stable
  
 
 \subsection{Operator and Term Splitting}
+You might have wondered that our approximation schemes all were targeted at 1-dimensional problems, but our model is formulated in two dimensions. In turns out that by an elegant trick
+we actually only need the 1-dimensional approximations.
 
-\subsection{Final Schema}
+\subsection{Final Scheme}
 
 \section{Implementation}
+You can find all code here \\ \url{https://github.com/applied-math-coding/basic-diffusion-transport} \\ and
+a running example here \\
+ \url{https://applied-math-coding.github.io/basic-diffusion-transport/}.
 
 \section{Further Reading}
 This article intends to give an introduction into all treated areas.
 There are many good books or only tutorials about numerical treatment of partial
 differential equations. Or if you are more specialized on fluid dynamics you will
 many good accounts on this field too. In case your are more interested in the 
-implementation side, be encouraged to clone the entire project from https://github.com/applied-math-coding/basic-diffusion-transport and to extend or play around.
+implementation side, be encouraged to clone the entire project from
+\url{https://github.com/applied-math-coding/basic-diffusion-transport} and to extend or play around.
 \end{document}
