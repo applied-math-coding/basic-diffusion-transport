@@ -203,7 +203,7 @@ e^{at}=1-c\frac{\Delta t}{\Delta x}\left(1-e^{-jk\Delta x}\right)
 \end{equation*}
 We can use the triangle inequality to estimate
 \begin{equation*}
-e^{at}\leq |1-c\frac{\Delta t}{\Delta x}| + c\frac{\Delta t}{\Delta x}
+e^{at}\leq \left|1-c\frac{\Delta t}{\Delta x}\right| + c\frac{\Delta t}{\Delta x}
 \end{equation*}
 Note, we have used the known identity $|e^{jy}|=1$.\\
 From the we can conclude the r.h.s to be lower $1$ if $0\leq c\Delta t/\Delta x\leq 1$ or equivalent
@@ -218,22 +218,101 @@ we have treated diffusion and advection independent of each other whereas in our
 model they interact with each other.\\
 The secrete behind this is an elegant trick referred as Operator and Term Splitting which allows us in the final implementation to separate dimensions and
 transport mechanisms. In other words we can implement for each dimension and each
-transport mechanism a scheme and then combine these scheme which each other.\\
+transport mechanism a scheme and then combine these schemes with each other.\\
 
+\subsubsection{Dimensional Split}
+Let us use the advection-scheme as explanatory example. Once understanding the idea, the reader easily can adapt the techniques to other schemes.\\
+We can write scheme (\ref{advection_scheme_upwind}) in an operator form
+\begin{equation*}
+L_{x} := id - c\Delta t \delta_{x}+S
+\end{equation*}
+Hereby $\delta_{x}$ stands for an operator which takes a function $u$ as argument and 
+returns the approximated first derivative on a given grid, that is
+\begin{equation*}
+\delta_{x}(u_{i}) = \frac{u_{i}-u_{i-1}}{\Delta x}
+\end{equation*}
+Further $id$ denotes the identity operator
+\begin{equation*}
+id(u_{i})=u_{i}
+\end{equation*}
+ and $S$ a constant operator
+\begin{equation*}
+S(u_{i})=S_{i}
+\end{equation*}
+With this definitions our scheme (\ref{advection_scheme_upwind}) can be written as
+\begin{equation*}
+u^{n+1}_{i} = L_{x}(u^{n}_{i})
+\end{equation*}
+In analogy we can define the operator $L_{y}$ which applies in $y$-direction
+\begin{equation*}
+L_{y}:=id - c\Delta t \delta_{y}+S
+\end{equation*}
+and compute the composition of both
+\begin{equation} \label{L_x_comp_L_y}
+L_{x}\circ L_{y}=id-c\Delta t\delta_{x}-c\Delta t\delta_{y}+o(2)
+\end{equation}
+In the later we have skipped terms of order $2$ in $\Delta t$.
+The general advaction-process in dimension 2 has the form,
+\begin{equation*}
+\frac{\partial u}{\partial t} = -c_{x}\frac{\partial u}{\partial x}-c_{y} \frac{\partial u}{\partial y}
+\end{equation*}
+We can use derivative approximations from section \ref{derivate_approx} to obtain a scheme in the form
+\begin{equation} \label{L_xy_scheme}
+u_{i,j}^{n+1}=u_{i,j}^{n}-c_{x}\frac{\Delta t}{\Delta x}(u_{i,j}^{n}-u_{i-1,j}^{n})
+-c_{y}\frac{\Delta t}{\Delta x}(u_{i,j}^{n}-u_{i,j-1}^{n})
+\end{equation}
+Now it is an easy task to verify that 
+\begin{equation*}
+L_{x}\circ L_{y}(u_{i,j})=u_{i,j}^{n}-c_{x}\frac{\Delta t}{\Delta x}(u_{i,j}^{n}-u_{i-1,j}^{n})
+-c_{y}\frac{\Delta t}{\Delta x}(u_{i,j}^{n}-u_{i,j-1}^{n}) +o(2)
+\end{equation*}
+and by comparing with (\ref{L_xy_scheme}) to see that the 2-dimensional scheme coincides 
+up to order 2 with the composition of the 1-dimensional scheme.\\
+Therefore, in our implementation instead of writing the scheme (\ref{L_xy_scheme}) we will first apply the advection scheme (\ref{advection_scheme_upwind}) for $x$-direction and on the result we will again apply (\ref{advection_scheme_upwind}) but in $y$-direction.
 
-//TODO give exemplary proof of one split case
+\subsubsection{Term Splitting}
+The idea of term splitting is quite the same as for dimension splitting. But this times the split is done w.r.t different physical processes, that is diffusion and advection.\\
+Like for the advection scheme we can introduce an operator which describes scheme (\ref{diffusion_scheme})
+\begin{equation*}
+L_{d}:=id+\alpha\Delta t\delta_{xx}
+\end{equation*}
+whereas
+\begin{equation*}
+\delta_{xx}(u_{i})=\frac{u_{i-1}-2u_{i}+u_{i+1}}{\Delta x^2}
+\end{equation*}
+When we compose $L_{d}$ with $L_{x}$ from previous section we obtain
+\begin{equation*}
+L_{x}\circ L_{d}=id-c\Delta t\delta_{x}+\alpha\Delta t\delta_{xx}+o(2)
+\end{equation*}
+A system containing diffusion and advection has in general the form
+\begin{equation*}
+\frac{\partial u}{\partial t} = -c\frac{\partial u}{\partial x}+\alpha\frac{\partial^2 u}{\partial x^2}
+\end{equation*}
+Again we can use the derivative approximations from section \ref{derivate_approx} to obtain a scheme
+\begin{equation} \label{diff_adv_scheme}
+u_{i}^{n+1}=u_{i}^{n}-c\Delta t\delta_{x}(u_{i}^{n})+\alpha\Delta t\delta_{xx}(u_{i}^{n})
+\end{equation}
+We observe that the composition $L_{x}\circ L_{d}$ coincides up to order 2 with above scheme.\\
+So, in implementation instead of writing (\ref{diff_adv_scheme}) we will first apply $L_{d}$ and on the result $L_{x}$.
 
 \subsection{Final Scheme}
-
-//TODO
+In previous sections we were describing things a little bit more general than they actually are in our specific model. Since buoyancy only acts into $y$-direction we have only the $z$-component of velocity to have a positive value. Due to our specific boundary conditions we actually could model the entire system in 1-dimension but for educational reasons we do it in 2-dimensions.\\
+How final scheme can be written by using above operator expressions as
+\begin{equation} \label{final_scheme_expr}
+u_{i,j}^{n+1}=L_{x}\circ L_{D,y}\circ L_{D,x}(u_{i,j}^{n})
+\end{equation}
+$L_{D,x}$, $L_{D,y}$ denote the 1-dimensional diffusion operators applied in $x$-direction resp. $y$-direction.\\
+This is an explicit scheme which becomes very handy to implement in this form as we will see next.
 
 \section{Implementation}
-You can find all code here \\ \url{https://github.com/applied-math-coding/basic-diffusion-transport} \\ and
-a running example here \\
+This section together with section \ref{model_creation} might be the heart of this article. A ready who knows nothing about stability and naively starts implementing a posed model will soon or later recognize and honor the importance of stability considerations.\\
+We are going to explain only the important snippets of code. For a detailed view or for using as starting point the code can be cloned from here
+ \url{https://github.com/applied-math-coding/basic-diffusion-transport}.
+An online running example can be found here,
  \url{https://applied-math-coding.github.io/basic-diffusion-transport/}.
 
 //TODO
-descirbe the usfulness of op-splitting in implementation
+describe along with (\ref{final_scheme_expr})
 descr use of matrix-slides and functional-progr
 
 \section{Further Reading}
