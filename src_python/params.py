@@ -1,0 +1,14 @@
+L = 1  # m (the length of the block)
+g = 9.81  # m/s^2
+duration = 5 * 60  # s duration
+report_frequ = 1  # s
+v_max = 2  # m/s^2 max. abs. velocity
+lambda_ = 0.026  # J/(m*s*K) heat conductivity
+rho = 1.225  # kg/m^3 density
+c_p = 1004  # J/(kg*K) heat-capacity
+T_c = 273  # K  cold-temp
+T_h = 273 + 5  # K hot-temp
+v_max = 2  # m/s^2 max. abs. velocity
+duration = 60  # s duration,
+includeBuoyancy = True
+n_grid = 50

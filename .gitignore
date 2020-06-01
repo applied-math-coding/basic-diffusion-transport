@@ -48,3 +48,5 @@ Thumbs.db
 .yalc
 yalc.lock
 settings.json
+.venv
+__pycache__
