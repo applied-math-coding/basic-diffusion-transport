@@ -18,21 +18,31 @@ def adjust_boundary(T, v_x, v_y):
 
 
 def diffusion_x_op(T, alpha, delta_t, delta_x):
-    T[1:-2, 1:-2] = T[1:-2, 1:-2] + alpha * delta_t / \
-        pow(delta_x, 2) * (T[1:-2, 0:-3]-2*T[1:-2, 1:-2]+T[1:-2, 2:-1])
+    T[1:-1, 1:-1] = T[1:-1, 1:-1] + alpha * delta_t / \
+        pow(delta_x, 2) * (T[1:-1, 0:-2]-2*T[1:-1, 1:-1]+T[1:-1, 2:])
 
 
 def diffusion_y_op(T, alpha, delta_t, delta_x):
-    T[1:-2, 1:-2] = T[1:-2, 1:-2] + alpha * delta_t / \
-        pow(delta_x, 2) * (T[0:-3, 1:-2]-2*T[1:-2, 1:-2]+T[2:-1, 1:-2])
+    T_cen = T[1:-1, 1:-1]
+    T_down = T[0:-2, 1:-1]
+    T_up = T[2:, 1:-1]
+    T[1:-1, 1:-1] = T_cen + alpha * delta_t / \
+        pow(delta_x, 2) * (T_down-2*T_cen+T_up)
 
 
 def heat_convection_y_op(T, v_y, delta_t, delta_x):
-    T[1:-2, 1:-2] = T[1:-2, 1:-2] - delta_t / delta_x * \
-        v_y[1:-2, 1:-2] * (T[1:-2, 1:-2]-T[0:-3, 1:-2])
+    T_cen = T[1:-1, 1:-1]
+    T_down = T[0:-2, 1:-1]
+    v_y_cen = v_y[1:-1, 1:-1]
+    T[1:-1, 1:-1] = T_cen - delta_t / delta_x * v_y_cen * (T_cen-T_down)
 
 
 def mom_convection_y_op(T, v_y, delta_t, delta_x):
-    b = params.g * np.max(0, (T[1:-2, 1:-2]-T[2:-1, 1:-2])/T[2:-1, 1:-2])
-    v_y[1:-2, 1:-2] = v_y[1:-2, 1:-2] + delta_t * b - delta_t / \
-        delta_x * v_y[1:-2, 1:-2] * (v_y[1:-2, 1:-2]-v_y[0:-3, 1:-2])
+    T_cen = T[1:-1, 1:-1]
+    v_y_cen = v_y[1:-1, 1:-1]
+    v_y_down = v_y[0:-2, 1:-1]
+    T_up = T[2:, 1:-1]
+    b = params.g * np.maximum(np.zeros(T_cen.shape),
+                              (T_cen-T_up)/T_up)
+    v_y[1:-1, 1:-1] = v_y_cen + delta_t * b - \
+        delta_t / delta_x * v_y_cen * (v_y_cen-v_y_down)

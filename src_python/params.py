@@ -11,4 +11,4 @@ T_h = 273 + 5  # K hot-temp
 v_max = 2  # m/s^2 max. abs. velocity
 duration = 60  # s duration,
 includeBuoyancy = True
-n_grid = 50
+n_grid = 100

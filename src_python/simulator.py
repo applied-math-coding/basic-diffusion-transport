@@ -16,6 +16,7 @@ v_x = np.zeros((params.n_grid, params.n_grid))
 
 def simulate():
     t = 0
+    last_plot = 0
     while t <= params.duration:
         utils.adjust_boundary(T, v_x, v_y)
         utils.diffusion_x_op(T, alpha, delta_t, delta_x)
@@ -24,11 +25,14 @@ def simulate():
         utils.mom_convection_y_op(T, v_y, delta_t, delta_x)
         utils.adjust_boundary(T, v_x, v_y)
         t = t+delta_t
+        if t - last_plot > 1 or last_plot == 0:
+            plt.clf()
+            plt.imshow(T, origin='lower', vmin=params.T_c, vmax=params.T_h)
+            plt.pause(0.1)
+            last_plot = t
 
-#TODO check the pointwise 'max', make a basic simulated plot
 
 simulate()
 
-# x = np.linspace(0, 20, 100)  # Create a list of evenly-spaced numbers over the range
-# plt.plot(x, np.sin(x))       # Plot the sine of each x point
-# plt.show()
+
+plt.show()
