@@ -1,0 +1,15 @@
+\contentsline {section}{\numberline {1}Simulation Target}{2}{section.1}%
+\contentsline {section}{\numberline {2}Creation of Model}{2}{section.2}%
+\contentsline {section}{\numberline {3}Numerical Scheme}{2}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Derivative Approximations}{2}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Advection Scheme}{3}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Diffusion Scheme}{4}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Stability}{4}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Diffusion Scheme}{5}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Advection Scheme}{6}{subsubsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.5}Operator and Term Splitting}{6}{subsection.3.5}%
+\contentsline {subsubsection}{\numberline {3.5.1}Dimensional Split}{6}{subsubsection.3.5.1}%
+\contentsline {subsubsection}{\numberline {3.5.2}Term Splitting}{8}{subsubsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.6}Final Scheme}{8}{subsection.3.6}%
+\contentsline {section}{\numberline {4}Implementation}{9}{section.4}%
+\contentsline {section}{\numberline {5}Further Reading}{9}{section.5}%

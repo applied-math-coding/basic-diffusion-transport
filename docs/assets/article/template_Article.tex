@@ -12,11 +12,15 @@
 
 \begin{abstract}
 The aim of this document is to provide a simple guide how to create and implement a model for a heat-convection problem. Our approach is to start from underlying physics to pose the model-equations and then to explain difficulties arising during implementation.
-The full implemented result is provided by an external link, which deems to encourage the reader to extend and play with given implementation.
+The full implemented result is provided by an external link, which deems to encourage the reader to extend and play with it.
 We assume basic knowledge of Analysis and Linear Algebra as well as some understanding of 
 Fluid Dynamics. Chapters are written quite independent of each other so that the reader
-can skip parts in which no interest exist. 
+can skip parts in which no interest exist.
+This all deems as an introduction into the subject. Numerical treatment of Fluid Dynamic belongs to one of the most challenging tasks in numerical mathematics.
+For the given problem, which is quite easy in each nature our chosen method might work quite satisfactory, but be aware that for other problems much more sophisticated methods are to be taken into consideration.
 \end{abstract}
+
+\tableofcontents
 
 \section{Simulation Target}
 We consider a room of cubical shape.\\
@@ -25,7 +29,7 @@ The bottom is assumed to be heated by the sun-light through radiation.\\
 Our goal is to simulate how this heat is being transferred through the room over time.
 TODO picture
 
-\section{Creation of Model}
+\section{Creation of Model} \label{model_creation}
 There are two main mechanism of heat transfer in nature. One is diffusion the other is advection.
 
 
@@ -34,29 +38,93 @@ There are two main mechanism of heat transfer in nature. One is diffusion the ot
 \frac{\partial v_{z}}{\partial t}&=g\frac{T-T_{A}}{T_{A}}-v_{z}\frac{\partial v_{z}}{\partial z} \nonumber
 \end{align}
 
-\section{Numerical Scheme}
-In order to solve the model equations (\ref{model_equations}) numerically we are going to use the so called Finite Difference Method. This requires to lay a fixed grid over our domain (the room) and replace all derivative expressions by discrete approximations.
 
-\subsection{Derivative Approximations}
+\section{Numerical Scheme}
+In order to solve the model equations (\ref{model_equations}) numerically we are going to use the so called Finite Difference Method. This requires to lay a fixed grid over our domain (the room) and replace all derivative expressions by discrete approximations.\\
+Moreover, as we have seen in section \ref{model_creation}, physical properties like
+heat and momentum are transported by diffusion and advection processes.\\
+Our goal in this section is to provide a generic scheme for both mechanisms.
+Hereby we are going to consider both processes independent of each other and restrict
+attention to the 1-dimensional case. It will turn out later that this treatment is already
+sufficient for the final implementation.\\
+
+\subsection{Derivative Approximations} \label{derivate_approx}
 The main method to obtain such approximations for derivatives is using Taylor expansion.
 We give a detailed description for one specific derivative expression but leave the remaining for the reader since they are produced in analogy.\\
+Also, for reasons becoming clear later, we restrict our attention to 1-dimensional functions.
+Consider the two Taylor expansions,
+\begin{equation*}
+u(x+h)=u(x)+u'(x)h+\frac{1}{2}u''(x)h^2+o(2)
+\end{equation*}
+\begin{equation*}
+u(x-h)=u(x)-u'(x)h+\frac{1}{2}u''(x)h^2+o(2)
+\end{equation*}
+By adding both equations we obtain
+\begin{equation*}
+u(x+h)+u(x-h)=2u(x)+u''(x)h^2
+\end{equation*}
+By solving the later for $u''(x)$ we get a second-order approximation for the second derivative
+of $u$.
+\begin{equation*} 
+u''(x)=\frac{1}{h^2}(u(x+h)+u(x-h)-2u(x)) + o(2)
+\end{equation*}
 
+For the numerical treatment we have to consider $u$ discrete in space and time.
+We define 
+\begin{equation*}
+u_{i}^{n}=u(t_{n}, x_{i})
+\end{equation*}
+or in case of 2-dimensions
+\begin{equation*}
+u_{i,j}^{n}=u(t_{n}, x_{i}, y_{j})
+\end{equation*}
 
-//TODO
+With this we can now easily list the approximations we are going to use, especially the one
+we just obtained for second-order derivatives.
 
-The following scheme is used for advection with positive velocity ($c>0$)
+\begin{eqnarray}
+	\left[\frac{\partial u}{\partial t}\right]_{i}^{n} & \approx \frac{1}{\Delta t}(u_{i}^{n+1}-u_{i}^{n}) \nonumber  \\
+	\left[\frac{\partial u}{\partial x}\right]_{i}^{n} & \approx \frac{1}{\Delta x}(u_{i}^{n}-u_{i-1}^{n})  \label{backward_in_space} \\
+	\left[\frac{\partial u}{\partial x}\right]_{i}^{n} & \approx \frac{1}{\Delta x}(u_{i+1}^{n}-u_{i}^{n}) \label{forward_in_space}  \\
+	\left[\frac{\partial^2 u}{\partial x^2}\right]_{i}^{n} & \approx
+	\frac{1}{\Delta x^2}(u_{i-1}^{n}-2u_{i}^{n}+u_{i+1}^{n}) \nonumber
+\end{eqnarray}
+
+For first derivative we have provided two approximations, (\ref{forward_in_space}) is called
+forward in space and (\ref{backward_in_space}) is called backward in space.
+
+Note, we only present a small selection of possible ways to approximate derivatives. Also, since this article deems as an introduction we only focused on explicit schemes, but the reader should be aware there exists another important category of so called implicit schemes.
+For a more comprehensive list and treatment the reader is referred to standard literature of finite difference method.
+
+\subsection{Advection Scheme}
+
+In general advaction processes have the form
+\begin{equation*}
+\frac{\partial u}{\partial t} = -c \frac{\partial u}{\partial x} + S
+\end{equation*}
+Here $S$ denotes a possible source term for the property $u$.\\
+By using approximations for derivatives as given in section \ref{derivate_approx}
+we can formulate the following scheme:
+
+For positive velocity ($c\geq 0$):
 \begin{equation} \label{advection_scheme_upwind}
-u_{i}^{n+1}=u_{i}^{n}-c\frac{\Delta t}{\Delta x} (u_{i}^{n}-u_{i-1}^{n})
+u_{i}^{n+1}=u_{i}^{n}-c\frac{\Delta t}{\Delta x} (u_{i}^{n}-u_{i-1}^{n}) + S_{i}^{n}
 \end{equation}
 
-and for negative velocity we use
+For negative velocity:
 \begin{equation} \label{advection_scheme_downwind}
-u_{i}^{n+1}=u_{i}^{n}-c\frac{\Delta t}{\Delta x} (u_{i+1}^{n}-u_{i-1}^{n})
+u_{i}^{n+1}=u_{i}^{n}-c\frac{\Delta t}{\Delta x} (u_{i+1}^{n}-u_{i-1}^{n}) +S_{i}^{n}
 \end{equation}
 
-The reason for splitting the scheme based on the direction of velocity becomes clear in chapter \ref{stability}.
+The reason for splitting the scheme based on the direction of velocity becomes clear in section \ref{stability}.
 
-For diffusion we use the scheme
+\subsection{Diffusion Scheme}
+Diffusion processes are of the form
+\begin{equation*}
+\frac{\partial u}{\partial t} = \alpha \frac{\partial^2 u}{\partial x^2}
+\end{equation*}
+and again by using derivative approximations from section \ref{derivate_approx} we
+formulate the following scheme:
 \begin{equation} \label{diffusion_scheme}
 u_{i}^{n+1}=u_{i}^ {n}+\alpha\frac{\Delta t}{\Delta x^{2}} (u_{i-1}^{n}-2u_{i}^{n}+u_{i+1}^{n})
 \end{equation}
@@ -101,22 +169,151 @@ step $n+1$ does not impact the overall outcome of the iteration.\\
 In order to show a given scheme to fulfill (\ref{scheme_error}) we use a method invented by John von Neumann.\\
 The idea behind this is to assume the errors can be approximated (or estimated) by a Fourier-expansion
 \begin{equation} \label{error_fourier_exp}
-\epsilon(t,x)=e^{at}\sum_{k}e^{ikx}
+\epsilon(t,x)=e^{at}\sum_{k}e^{jkx}
 \end{equation}
-In other words, some function which decreases or increases exponentially in time. Having any concrete scheme $A$, we can use above representation of $\epsilon(t,x)$ and use this in (\ref{error_scheme}). Also since $A$ is linear it is enough to restrict attention to a specific $k$ of the expansion.
-//TODO show advection and diffusion scheme is stable
- 
+In other words, some function which decreases or increases exponentially in time. Our aim is to find a scheme $A$ which enforces $a<0$ in above representation of $\epsilon(t,x)$.\\
+
+\subsubsection{Diffusion Scheme}
+We replace $\epsilon(t,x)$ in equation (\ref{scheme_error}) by using for $A$ the scheme given in (\ref{diffusion_scheme}). Since $A$ is linear we can restrict attention to one specific index $k$ in (\ref{error_fourier_exp}) to obtain
+\begin{equation*}
+e^{a(t+\Delta t)}e^{jkx_{i}}=e^{at}e^{jkx_{i}}+\alpha\frac{\Delta t}{\Delta x^2}
+\left(e^{at}e^{jk(x_{i}-\Delta x)} -2e^{at}e^{jkx_{i}}+e^{at}e^{jk(x_{i}+\Delta x)}\right)
+\end{equation*}
+Note the we have used $x_{i-1}=x_{i}-\Delta x$, $x_{i+1}=x_{i}+\Delta x$ and $\epsilon(t_{n+1}, x_{i})=\epsilon(t_{n}+\Delta t, x_{i})$.\\
+Further by canceling out factors on both sides we get
+\begin{equation*}
+e^{a\Delta t}=1+\alpha\frac{\Delta t}{\Delta x^2}
+\left(e^{-jk\Delta x} -2+e^{jk\Delta x}\right)
+\end{equation*}
+Further by use of Euler's formula the r.h.s can be combined to get
+\begin{equation*}
+e^{a\Delta t}=1+\alpha\frac{\Delta t}{\Delta x^2}
+\left(2cos(k\Delta x) -2\right)
+\end{equation*}
+Since the $cos$ always has absolute values below $1$ we infer a sufficient condition the l.h.s to be lower $1$ is $2\alpha\frac{\Delta t}{\Delta x^2}\leq\frac{1}{2}$ or equivalently,
+\begin{equation} \label{stability_restr_diffusion}
+\Delta t\leq \frac{1}{4}\frac{\Delta x^2}{\alpha}
+\end{equation}
+In other words, in order to ensure our diffusion-scheme to be stable, we have to impose (\ref{stability_restr_diffusion}) onto our implementation - we cannot choose arbitrary large time steps $\Delta t$ for given a grid-width $\Delta x$.
+
+\subsubsection{Advection Scheme}
+The same steps as above but by using as $A$ the scheme (\ref{advection_scheme_upwind}) we obtain
+\begin{equation*}
+e^{at}=1-c\frac{\Delta t}{\Delta x}\left(1-e^{-jk\Delta x}\right)
+\end{equation*}
+We can use the triangle inequality to estimate
+\begin{equation*}
+e^{at}\leq \left|1-c\frac{\Delta t}{\Delta x}\right| + c\frac{\Delta t}{\Delta x}
+\end{equation*}
+Note, we have used the known identity $|e^{jy}|=1$.\\
+From the we can conclude the r.h.s to be lower $1$ if $0\leq c\Delta t/\Delta x\leq 1$ or equivalent
+\begin{equation} \label{stability_crit_advect}
+\Delta t\leq \frac{\Delta x}{c}
+\end{equation}
+For the case of $c<0$ above consideration would show scheme (\ref{advection_scheme_upwind}) to never be stable. But if the same steps as above are applied on scheme (\ref{advection_scheme_downwind}) instead we find the same stability criterion (\ref{stability_crit_advect}).
 
 \subsection{Operator and Term Splitting}
-You might have wondered that our approximation schemes all were targeted at 1-dimensional problems, but our model is formulated in two dimensions. In turns out that by an elegant trick
-we actually only need the 1-dimensional approximations.
+You might have wondered that our approximation schemes all were targeted at 1-dimensional problems, but our model is formulated in two dimensions. Moreover
+we have treated diffusion and advection independent of each other whereas in our
+model they interact with each other.\\
+The secrete behind this is an elegant trick referred as Operator and Term Splitting which allows us in the final implementation to separate dimensions and
+transport mechanisms. In other words we can implement for each dimension and each
+transport mechanism a scheme and then combine these schemes with each other.\\
+
+\subsubsection{Dimensional Split}
+Let us use the advection-scheme as explanatory example. Once understanding the idea, the reader easily can adapt the techniques to other schemes.\\
+We can write scheme (\ref{advection_scheme_upwind}) in an operator form
+\begin{equation*}
+L_{x} := id - c\Delta t \delta_{x}+S
+\end{equation*}
+Hereby $\delta_{x}$ stands for an operator which takes a function $u$ as argument and 
+returns the approximated first derivative on a given grid, that is
+\begin{equation*}
+\delta_{x}(u_{i}) = \frac{u_{i}-u_{i-1}}{\Delta x}
+\end{equation*}
+Further $id$ denotes the identity operator
+\begin{equation*}
+id(u_{i})=u_{i}
+\end{equation*}
+ and $S$ a constant operator
+\begin{equation*}
+S(u_{i})=S_{i}
+\end{equation*}
+With this definitions our scheme (\ref{advection_scheme_upwind}) can be written as
+\begin{equation*}
+u^{n+1}_{i} = L_{x}(u^{n}_{i})
+\end{equation*}
+In analogy we can define the operator $L_{y}$ which applies in $y$-direction
+\begin{equation*}
+L_{y}:=id - c\Delta t \delta_{y}+S
+\end{equation*}
+and compute the composition of both
+\begin{equation} \label{L_x_comp_L_y}
+L_{x}\circ L_{y}=id-c\Delta t\delta_{x}-c\Delta t\delta_{y}+o(2)
+\end{equation}
+In the later we have skipped terms of order $2$ in $\Delta t$.
+The general advaction-process in dimension 2 has the form,
+\begin{equation*}
+\frac{\partial u}{\partial t} = -c_{x}\frac{\partial u}{\partial x}-c_{y} \frac{\partial u}{\partial y}
+\end{equation*}
+We can use derivative approximations from section \ref{derivate_approx} to obtain a scheme in the form
+\begin{equation} \label{L_xy_scheme}
+u_{i,j}^{n+1}=u_{i,j}^{n}-c_{x}\frac{\Delta t}{\Delta x}(u_{i,j}^{n}-u_{i-1,j}^{n})
+-c_{y}\frac{\Delta t}{\Delta x}(u_{i,j}^{n}-u_{i,j-1}^{n})
+\end{equation}
+Now it is an easy task to verify that 
+\begin{equation*}
+L_{x}\circ L_{y}(u_{i,j})=u_{i,j}^{n}-c_{x}\frac{\Delta t}{\Delta x}(u_{i,j}^{n}-u_{i-1,j}^{n})
+-c_{y}\frac{\Delta t}{\Delta x}(u_{i,j}^{n}-u_{i,j-1}^{n}) +o(2)
+\end{equation*}
+and by comparing with (\ref{L_xy_scheme}) to see that the 2-dimensional scheme coincides 
+up to order 2 with the composition of the 1-dimensional scheme.\\
+Therefore, in our implementation instead of writing the scheme (\ref{L_xy_scheme}) we will first apply the advection scheme (\ref{advection_scheme_upwind}) for $x$-direction and on the result we will again apply (\ref{advection_scheme_upwind}) but in $y$-direction.
+
+\subsubsection{Term Splitting}
+The idea of term splitting is quite the same as for dimension splitting. But this times the split is done w.r.t different physical processes, that is diffusion and advection.\\
+Like for the advection scheme we can introduce an operator which describes scheme (\ref{diffusion_scheme})
+\begin{equation*}
+L_{d}:=id+\alpha\Delta t\delta_{xx}
+\end{equation*}
+whereas
+\begin{equation*}
+\delta_{xx}(u_{i})=\frac{u_{i-1}-2u_{i}+u_{i+1}}{\Delta x^2}
+\end{equation*}
+When we compose $L_{d}$ with $L_{x}$ from previous section we obtain
+\begin{equation*}
+L_{x}\circ L_{d}=id-c\Delta t\delta_{x}+\alpha\Delta t\delta_{xx}+o(2)
+\end{equation*}
+A system containing diffusion and advection has in general the form
+\begin{equation*}
+\frac{\partial u}{\partial t} = -c\frac{\partial u}{\partial x}+\alpha\frac{\partial^2 u}{\partial x^2}
+\end{equation*}
+Again we can use the derivative approximations from section \ref{derivate_approx} to obtain a scheme
+\begin{equation} \label{diff_adv_scheme}
+u_{i}^{n+1}=u_{i}^{n}-c\Delta t\delta_{x}(u_{i}^{n})+\alpha\Delta t\delta_{xx}(u_{i}^{n})
+\end{equation}
+We observe that the composition $L_{x}\circ L_{d}$ coincides up to order 2 with above scheme.\\
+So, in implementation instead of writing (\ref{diff_adv_scheme}) we will first apply $L_{d}$ and on the result $L_{x}$.
 
 \subsection{Final Scheme}
+In previous sections we were describing things a little bit more general than they actually are in our specific model. Since buoyancy only acts into $y$-direction we have only the $z$-component of velocity to have a positive value. Due to our specific boundary conditions we actually could model the entire system in 1-dimension but for educational reasons we do it in 2-dimensions.\\
+How final scheme can be written by using above operator expressions as
+\begin{equation} \label{final_scheme_expr}
+u_{i,j}^{n+1}=L_{x}\circ L_{D,y}\circ L_{D,x}(u_{i,j}^{n})
+\end{equation}
+$L_{D,x}$, $L_{D,y}$ denote the 1-dimensional diffusion operators applied in $x$-direction resp. $y$-direction.\\
+This is an explicit scheme which becomes very handy to implement in this form as we will see next.
 
 \section{Implementation}
-You can find all code here \\ \url{https://github.com/applied-math-coding/basic-diffusion-transport} \\ and
-a running example here \\
+This section together with section \ref{model_creation} might be the heart of this article. A ready who knows nothing about stability and naively starts implementing a posed model will soon or later recognize and honor the importance of stability considerations.\\
+We are going to explain only the important snippets of code. For a detailed view or for using as starting point the code can be cloned from here
+ \url{https://github.com/applied-math-coding/basic-diffusion-transport}.
+An online running example can be found here,
  \url{https://applied-math-coding.github.io/basic-diffusion-transport/}.
+
+//TODO
+describe along with (\ref{final_scheme_expr})
+descr use of matrix-slides and functional-progr
 
 \section{Further Reading}
 This article intends to give an introduction into all treated areas.
