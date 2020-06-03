@@ -4,6 +4,7 @@ import { SimulationData } from './simulation-data';
 import { of, Subscription } from 'rxjs';
 import { Params } from './params';
 import { SelectItem } from 'primeng/api/selectitem';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',

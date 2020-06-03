@@ -10,11 +10,15 @@ import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { SpinnerModule } from 'primeng/spinner';
 import { RoundPipe } from './round.pipe';
+import { SafeResourceUrl } from './safe-resource-url.pipe';
+import { SafeUrlPipe } from './safe-url.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
-    RoundPipe
+    RoundPipe,
+    SafeResourceUrl,
+    SafeUrlPipe
   ],
   imports: [
     BrowserModule,
