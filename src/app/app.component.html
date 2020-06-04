@@ -4,8 +4,8 @@
     <a class="doc-link" [href]="'assets/article/template_Article.pdf' | safeUrl" target="_blank">Documentation</a>
   </div>
   <div class="buttons">
-    <button pButton type="button" label="Start Simulation" class="ui-button-success"
-      (click)="handleStartSimulation()"></button>
+    <button pButton type="button" label="Start Simulation" class="ui-button-success" (click)="handleStartSimulation()"
+      [disabled]="subscription && !subscription.closed"></button>
     <button pButton type="button" label="Stop Simulation" class="ui-button-danger"
       (click)="handleStopSimulation()"></button>
   </div>

@@ -60,7 +60,7 @@ export class Simulator {
     let { T } = d;
     T = T.shrink(1);
     calc<Matrix>`${T} = ${T} + ${this.alpha * this.delta_t / this.delta_x ** 2}
-      * (${T.shift_x(-1)} - 2 * ${T} + ${T.shift_x(1)})`;
+      * (${T.shift_c(-1)} - 2 * ${T} + ${T.shift_c(1)})`;
     return d;
   }
 
@@ -68,7 +68,7 @@ export class Simulator {
     let { T } = d;
     T = T.shrink(1);
     calc<Matrix>`${T} = ${T} + ${this.alpha * this.delta_t / this.delta_x ** 2}
-      * (${T.shift_y(-1)} - 2 * ${T} + ${T.shift_y(1)})`;
+      * (${T.shift_r(-1)} - 2 * ${T} + ${T.shift_r(1)})`;
     return d;
   }
 
@@ -76,18 +76,18 @@ export class Simulator {
     let { T, v_y } = d;
     T = T.shrink(1);
     v_y = v_y.shrink(1);
-    calc<Matrix>`${T} = ${T} -  ${v_y} % ${this.delta_t / this.delta_x} % (${T} - ${T.shift_y(-1)})`;
+    calc<Matrix>`${T} = ${T} -  ${v_y} % ${this.delta_t / this.delta_x} % (${T} - ${T.shift_r(-1)})`;
     return d;
   }
 
   private mom_convection_y_op(d: DynamicVars): DynamicVars {
     let { T, v_y } = d;
     T = T.shrink(1);
-    const T_A = T.shift_y(1);
+    const T_A = T.shift_r(1);
     const b = calc<Matrix>`${this.g} * max(0, (${T} - ${T_A})/${T_A})`;
     v_y = v_y.shrink(1);
     calc<Matrix>`${v_y} = ${v_y} + ${this.delta_t} % ${b}
-      - ${v_y} % ${this.delta_t / this.delta_x} % (${v_y} - ${v_y.shift_y(-1)})`;
+      - ${v_y} % ${this.delta_t / this.delta_x} % (${v_y} - ${v_y.shift_r(-1)})`;
     return d;
   }
 

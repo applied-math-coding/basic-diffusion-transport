@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
   private newData = new EventEmitter<SimulationData>();
   currData: SimulationData;
   private worker: Worker;
-  private subscription: Subscription;
+  subscription: Subscription;
   params = new Params();
   gridOptions: SelectItem[];
 
