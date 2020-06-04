@@ -17,6 +17,7 @@ v_x = np.zeros((params.n_grid, params.n_grid))
 def simulate():
     t = 0
     last_plot = 0
+    global delta_t
     while t <= params.duration:
         utils.adjust_boundary(T, v_x, v_y)
         utils.diffusion_x_op(T, alpha, delta_t, delta_x)
@@ -24,6 +25,8 @@ def simulate():
         utils.heat_convection_y_op(T, v_y, delta_t, delta_x)
         utils.mom_convection_y_op(T, v_y, delta_t, delta_x)
         utils.adjust_boundary(T, v_x, v_y)
+        v_max = np.max(np.abs(v_y))
+        delta_t = utils.calc_min_delta_t(delta_x, alpha, v_max)
         t = t+delta_t
         if t - last_plot > 1 or last_plot == 0:
             plt.clf()

@@ -1,6 +1,7 @@
 \documentclass[]{article}
 \usepackage{amsmath}
 \usepackage{hyperref}
+\usepackage{listings}
 
 %opening
 \title{Implementing of a simple Heat-Convection Model}
@@ -305,15 +306,86 @@ $L_{D,x}$, $L_{D,y}$ denote the 1-dimensional diffusion operators applied in $x$
 This is an explicit scheme which becomes very handy to implement in this form as we will see next.
 
 \section{Implementation}
-This section together with section \ref{model_creation} might be the heart of this article. A ready who knows nothing about stability and naively starts implementing a posed model will soon or later recognize and honor the importance of stability considerations.\\
-We are going to explain only the important snippets of code. For a detailed view or for using as starting point the code can be cloned from here
- \url{https://github.com/applied-math-coding/basic-diffusion-transport}.
-An online running example can be found here,
+This section will explain the important snippets of code which can be found at \url{https://github.com/applied-math-coding/basic-diffusion-transport}. \\
+Implementation is provided in Typescript (by utilizing the package [TODO lina]) and in Python.
+An online running example can be found here,\\
  \url{https://applied-math-coding.github.io/basic-diffusion-transport/}.
+We will give detailed explanations for the Python code only. The Typescript code is similar structured and due to the use of [TODO lina] operator implementation are quite straight forward.\\
 
-//TODO
-describe along with (\ref{final_scheme_expr})
-descr use of matrix-slides and functional-progr
+Model parameter are defined in the file 'params.py'.
+We initialize the temperature and velocity field by using three matrices. Note, the matrices
+include the boundaries:
+\begin{lstlisting}[language=Python]
+T = np.empty((params.n_grid, params.n_grid))
+T.fill(params.T_c)
+v_y = np.zeros((params.n_grid, params.n_grid))
+v_x = np.zeros((params.n_grid, params.n_grid))
+\end{lstlisting}
+
+We iterate the application of all operators and ensure the results are directly written
+into above matrices:
+\begin{lstlisting}[language=Python]
+def simulate():
+  t = 0
+  while t <= params.duration:
+    utils.adjust_boundary(T, v_x, v_y)
+    utils.diffusion_x_op(T, alpha, delta_t, delta_x)
+    utils.diffusion_y_op(T, alpha, delta_t, delta_x)
+    utils.heat_convection_y_op(T, v_y, delta_t, delta_x)
+    utils.mom_convection_y_op(T, v_y, delta_t, delta_x)
+    utils.adjust_boundary(T, v_x, v_y)
+    t = t+delta_t
+\end{lstlisting}
+
+Each operator is defined in file 'utils.py'.
+The boundary conditions are ensured by:
+\begin{lstlisting}[language=Python]
+def adjust_boundary(T, v_x, v_y):
+  T[0, :] = params.T_h
+  T[-1, :] = T[-2, :]
+  T[:, 0] = T[:, 1]
+  T[:, -1] = T[:, -2]
+  v_y[0, :] = 0
+  v_y[-1, :] = v_y[-2, :]
+  v_y[:, 0] = v_y[:, 1]
+  v_y[:, -1] = v_y[:, -2]
+\end{lstlisting}
+
+In order to implement the operators, instead of using loops we are element-wise combining (adding, ...) matrices which indexes are shifted correspondingly in order to achieve the 
+specific schemes receipt (note how much the implementation resembles the actual scheme's definition):
+\begin{lstlisting}[language=Python]
+def diffusion_x_op(T, alpha, delta_t, delta_x):
+  T[1:-1, 1:-1] = T[1:-1, 1:-1] + alpha * delta_t / \
+  pow(delta_x, 2)
+    * (T[1:-1, 0:-2]-2*T[1:-1, 1:-1]+T[1:-1, 2:])
+
+
+def diffusion_y_op(T, alpha, delta_t, delta_x):
+  T_cen = T[1:-1, 1:-1]
+  T_down = T[0:-2, 1:-1]
+  T_up = T[2:, 1:-1]
+  T[1:-1, 1:-1] = T_cen + alpha * delta_t / \
+  pow(delta_x, 2) * (T_down-2*T_cen+T_up)
+
+
+def heat_convection_y_op(T, v_y, delta_t, delta_x):
+  T_cen = T[1:-1, 1:-1]
+  T_down = T[0:-2, 1:-1]
+  v_y_cen = v_y[1:-1, 1:-1]
+  T[1:-1, 1:-1] = T_cen - delta_t / delta_x * v_y_cen
+    * (T_cen-T_down)
+
+
+def mom_convection_y_op(T, v_y, delta_t, delta_x):
+  T_cen = T[1:-1, 1:-1]
+  v_y_cen = v_y[1:-1, 1:-1]
+  v_y_down = v_y[0:-2, 1:-1]
+  T_up = T[2:, 1:-1]
+  b = params.g * np.maximum(np.zeros(T_cen.shape),
+  (T_cen-T_up)/T_up)
+  v_y[1:-1, 1:-1] = v_y_cen + delta_t * b - \
+  delta_t / delta_x * v_y_cen * (v_y_cen-v_y_down)
+\end{lstlisting}
 
 \section{Further Reading}
 This article intends to give an introduction into all treated areas.
