@@ -2,6 +2,7 @@
 \usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{listings}
+\usepackage{graphicx}
 
 %opening
 \title{Implementing of a simple Heat-Convection Model}
@@ -28,16 +29,140 @@ We consider a room of cubical shape.\\
 We assume all walls except the bottom to allow transfer of air (open walls).\\
 The bottom is assumed to be heated by the sun-light through radiation.\\
 Our goal is to simulate how this heat is being transferred through the room over time.
-TODO picture
+
+\includegraphics{setup}
 
 \section{Creation of Model} \label{model_creation}
-There are two main mechanism of heat transfer in nature. One is diffusion the other is advection.
+There are two main mechanism of heat transfer in nature. One is diffusion the other is advection. We will shortly explain these two mechanisms and how to incorporate this into a model. For a detailed account on this, the reader is referred to standard literature on Fluid Dynamics.\\
+\subsection{Heat Diffusion}
+Consider a volume $V$ with edge length $\Delta x$. We denote the temperature at the left surface by $T_L$ and at the right surface by $T_R$. Then Fourier's law states the heat-flux through left surface is
+\begin{equation} \label{heat_flux_left}
+I(x_0)=-\lambda\frac{\partial T}{\partial x}(x_0)
+\end{equation}
+and through right surface is
+\begin{equation} \label{heat_flux_right}
+I(x_1)=-\lambda\frac{\partial T}{\partial x}(x_1)
+\end{equation}
+$I$ is the amount of heat-energy passing per unit of time through unit of area.
+The coefficient $\lambda$ depends on the material.
+Furthermore each material which is added heat-energy is changing its temperature according to
+\begin{equation*}
+c_p \Delta T=\Delta q
+\end{equation*}
+$q$ denotes the heat-energy per unit of mass and $c_p$ the specific heat capacity. The later depends on the material. By using the density $\rho$ we can rewrite this as
+\begin{equation} \label{specific_heat}
+c_p \Delta T=\frac{1}{\rho V} \Delta Q
+\end{equation}
+$Q$ denotes the total heat energy added to the volume $V$.
+Analogous consideration as done in (\ref{heat_flux_left}) and (\ref{heat_flux_right}) can be made for all other surfaces. That is, each surface
+contributes either positive or negative depending on the direction of flow to the internal change of heat energy per unit of time.
+We can formulate this by
+\begin{equation*}
+\Delta Q = A\Delta t \sum_{j}-I_{j}(x_{j}+\Delta x)+I_{j}(x_{j})
+\end{equation*}
+where $A$ denotes the area of a surface, $I_{j}(x_j)$ the heat-flux through surface $S_j$
+and $I_{j}(x_j+\Delta x)$ the heat-flux through the opposite surface in $V$. Summation is carried out only over the three surfaces which span the volume.
+By setting $A=V/\Delta x$ and using equations (\ref{heat_flux_left}), (\ref{heat_flux_right}), (\ref{specific_heat}) in the left and right side correspondingly we obtain
+\begin{equation*}
+\rho c_p V\Delta T = \lambda A\Delta t\sum_{j}\frac{\partial T}{\partial x_j}(x_j+\Delta x)-\frac{\partial T}{\partial x_j}(x_j)
+\end{equation*}
+By using $V/A=\Delta x$ this equation is equivalent to
+\begin{equation*}
+\rho c_p \frac{\Delta T}{\Delta t} = \frac{\lambda}{\Delta x}\sum_{j}\frac{\partial T}{\partial x_j}(x_j+\Delta x)-\frac{\partial T}{\partial x_j}(x_j)
+\end{equation*}
+At the end we can consider the limit $\Delta x\rightarrow 0$ to find the heat-diffusion equation
+\begin{equation}
+\frac{\partial T}{\partial t}=\frac{\lambda}{\rho\alpha}\Delta T
+\end{equation}
+Note, $\Delta T$ refers to the Laplace operator here ($\Delta T=\nabla\cdot\nabla T$).
 
+\subsection{Advection}
+Advection describes the mechanism a physical property to be transported by a bulk movement. In our example the bulk movement is presented by the wind and the physical property is either momentum or heat.\\
+We consider the same volume $V$ as in previous section and denote the physical (scalar) property by $\phi$. Here $\phi$ shall be given per unit of mass. In addition we denote by $\textbf{v}$ the current velocity field. At the left surface let us consider the normal directed velocity component $v_x$. During the interval $\Delta t$ we have a displacement of mass by
+\begin{equation} \label{displacement}
+\xi_{x}=v_x\Delta t
+\end{equation} 
+Thus the net balance of mass flowing into and out of $V$ through the left and right surface is
+\begin{equation} \label{net_flow}
+-\rho A\cdot\xi_{x} \cdot \phi(x+\Delta x)+\rho A\cdot\xi_{x} \cdot \phi(x)
+\end{equation}
+By using (\ref{displacement}) and $A=V/\Delta x$ we can write this as
+\begin{equation*}
+\rho v_x\Delta t\cdot V \frac{\phi (x)-\phi(x+\Delta x)}{\Delta x}
+\end{equation*}
+By letting $\Delta x\rightarrow 0$ we obtain
+\begin{equation*}
+-\rho v_x\Delta t\cdot V \frac{\partial \phi}{\partial x}(x)
+\end{equation*}
+The same consideration can be done in $y$ and $z$ direction to obtain as net change of $phi$
+\begin{equation*}
+\rho V \Delta \phi = -\rho V \Delta t \left(v_x \frac{\partial \phi}{\partial x}+
+ v_y \frac{\partial \phi}{\partial y}+
+ +v_z \frac{\partial \phi}{\partial z}\right)
+\end{equation*}
+Dividing by $\rho V \Delta t$ and letting $\Delta t\rightarrow 0$, we obtain
+\begin{equation} \label{transp_equation}
+\frac{\partial\phi}{\partial t}=-\textbf{v}\cdot\nabla\phi
+\end{equation}
 
+We can now use this equation to express transport of heat-energy. Heat-energy and temperature are 
+related by $c_p T=u$ where $u$ denotes the inner energy. So what in fact is transported is $u$ and be inserting we get
+\begin{equation} \label{transp_heat}
+\frac{\partial T}{\partial t}=-\textbf{v}\cdot\nabla T
+\end{equation}
+As for the moment we can do similar considerations but things are little more involved since the velocity is transported so to say by itself. More in detail, when posing the net balance in (\ref{net_flow}) we instead have to take into account that the moved distance $\xi$ depends on its location. For the left surface we would have $\xi_{x}=v_{x}\Delta t$ and for the right one  $\xi_{x+\Delta x}=v_{x+\Delta x}\Delta t$. Putting this into equation yields
+\begin{equation*}
+-\rho A\cdot v_{x+\Delta x}\cdot\Delta t \cdot \phi(x+\Delta x)+\rho A\cdot v_{x}\cdot\Delta t \cdot \phi(x)
+\end{equation*}
+We can apply a trick and rewrite this as
+\begin{align*}
+&-\rho A\cdot v_{x+\Delta x}\cdot\Delta t \cdot \phi(x+\Delta x) \\ &+
+\rho A\cdot v_{x}\cdot\Delta t \cdot \phi(x+\Delta x) -
+\rho A\cdot v_{x}\cdot\Delta t \cdot \phi(x+\Delta x) \\ &+
+\rho A\cdot v_{x}\cdot\Delta t \cdot \phi(x)
+\end{align*}
+Further by putting terms together as
+\begin{align*}
+&\rho A\cdot (v_{x}-v_{x+\Delta x})\cdot\Delta t \cdot \phi(x+\Delta x) \\ &+
+\rho A\cdot v_{x}\cdot\Delta t \cdot (\phi(x)-\phi(x+\Delta x))
+\end{align*}
+By doing analogous reformulation as done to obtain equation (\ref{transp_equation}) we arrive at
+\begin{equation*}
+\frac{\partial\phi}{\partial t}=-\textbf{v}\cdot\nabla\phi-\phi\nabla\cdot\textbf{v}
+\end{equation*}
+Note, since moment applies in all three directions we have to consider as $\phi$ all three components, $v_x, v_y, v_z$ of velocity. Hence we obtain the following system of equations
+\begin{equation*}
+\frac{\partial\textbf{v}}{\partial t}=-\textbf{v}\cdot\nabla\textbf{v}-\textbf{v}(\nabla\cdot\textbf{v})
+\end{equation*}
+Note, in very generic contexts one also takes the change of density into account, but here we will assume the density to be global constant.
+Also for our needs it will suffice to assume incrompressibility , that is, $\nabla\cdot\textbf{v}=0$. It expresses in essence that all mass flowing into the volume must flow out somewhere else.
+Out final equation for the moment becomes
+\begin{equation} \label{moment_transp_final}
+\frac{\partial\textbf{v}}{\partial t}=-\textbf{v}\cdot\nabla\textbf{v}
+\end{equation}
+
+\subsection{Momentum Sources}
+The initial velocity is assumed to be 0 everywhere. For changes in moment due to Newton it requires a force. For simplification we assume the pressure is in so called static equilibrium.
+With these assumptions we can obtain at a force which is called buoyancy. It always arises when
+a region of warmer fluid is surrounded by colder fluid. It only applies in vertical direction and
+can be formulated it terms of an acceleration as
+\begin{equation}
+\textbf{F}_{B}=g\frac{T-T_{A}}{T_{A}}\textbf{e}_{z}
+\end{equation}
+Here $g$ denotes the gravity acceleration and $T_A$ the surrounding temperature.
+For a detailed derivation see standard literature in Fluid Dynamics.
+Note, in our implementation we will assume this $T_A$ is just given by the temperature above
+the considered grid-point.
+\subsection{Final Model}
+
+A final very simplified model looks like this
 \begin{align} 
 \frac{\partial T}{\partial t}&=-\textbf{v}\cdot \nabla T + \frac{k}{\rho\alpha}\Delta T \label{model_equations} \\
 \frac{\partial v_{z}}{\partial t}&=g\frac{T-T_{A}}{T_{A}}-v_{z}\frac{\partial v_{z}}{\partial z} \nonumber
 \end{align}
+
+Although we could restrict computation on dimension 1 we will do it for dimension 2 in order to
+get more inside into the used techniques.
 
 
 \section{Numerical Scheme}
