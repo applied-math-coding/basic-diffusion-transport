@@ -2,18 +2,18 @@
 \contentsline {section}{\numberline {2}Creation of Model}{2}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Heat Diffusion}{2}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}Advection}{3}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Momentum Sources}{4}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Final Model}{4}{subsection.2.4}%
-\contentsline {section}{\numberline {3}Numerical Scheme}{4}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Derivative Approximations}{5}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Advection Scheme}{6}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Diffusion Scheme}{6}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}Stability}{7}{subsection.3.4}%
-\contentsline {subsubsection}{\numberline {3.4.1}Diffusion Scheme}{8}{subsubsection.3.4.1}%
-\contentsline {subsubsection}{\numberline {3.4.2}Advection Scheme}{8}{subsubsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.5}Operator and Term Splitting}{9}{subsection.3.5}%
-\contentsline {subsubsection}{\numberline {3.5.1}Dimensional Split}{9}{subsubsection.3.5.1}%
-\contentsline {subsubsection}{\numberline {3.5.2}Term Splitting}{10}{subsubsection.3.5.2}%
-\contentsline {subsection}{\numberline {3.6}Final Scheme}{11}{subsection.3.6}%
-\contentsline {section}{\numberline {4}Implementation}{11}{section.4}%
-\contentsline {section}{\numberline {5}Further Reading}{13}{section.5}%
+\contentsline {subsection}{\numberline {2.3}Momentum Sources}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Final Model}{5}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Numerical Scheme}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Derivative Approximations}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Advection Scheme}{7}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Diffusion Scheme}{7}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Stability}{8}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Diffusion Scheme}{9}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Advection Scheme}{9}{subsubsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.5}Operator and Term Splitting}{10}{subsection.3.5}%
+\contentsline {subsubsection}{\numberline {3.5.1}Dimensional Split}{10}{subsubsection.3.5.1}%
+\contentsline {subsubsection}{\numberline {3.5.2}Term Splitting}{11}{subsubsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.6}Final Scheme}{12}{subsection.3.6}%
+\contentsline {section}{\numberline {4}Implementation}{12}{section.4}%
+\contentsline {section}{\numberline {5}Further Reading}{14}{section.5}%
