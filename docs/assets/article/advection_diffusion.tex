@@ -509,12 +509,13 @@ def mom_convection_y_op(T, v_y, delta_t, delta_x):
   v_y[1:-1, 1:-1] = v_y_cen + delta_t * b - \
   delta_t / delta_x * v_y_cen * (v_y_cen-v_y_down)
 \end{lstlisting}
+\noindent
+All code provided in this section is not intended for use in production environments. It is aimed for educational purposes only. For any mistakes the author does not take any responsibilities.
 
 \section{Further Reading}
 This article intends to give an introduction into all treated areas.
-There are many good books or only tutorials about numerical treatment of partial
-differential equations. Or if you are more specialized on fluid dynamics you will
-many good accounts on this field too. In case your are more interested in the 
-implementation side, be encouraged to clone the entire project from
+There are many good books or online tutorials about numeric of partial
+differential equations. Or if you are more specialized on fluid dynamics you will find
+many good accounts on this field too. Please feel encouraged to clone the entire project from
 \url{https://github.com/applied-math-coding/basic-diffusion-transport} and to extend or play around.
 \end{document}
