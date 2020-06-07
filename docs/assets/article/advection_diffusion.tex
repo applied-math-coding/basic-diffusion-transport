@@ -84,68 +84,64 @@ We consider the same volume $V$ as in previous section and denote the physical (
 \end{equation} 
 Thus the net balance of mass flowing into and out of $V$ through the left and right surface is
 \begin{equation} \label{net_flow}
--\rho A\cdot\xi_{x} \cdot \phi(x+\Delta x)+\rho A\cdot\xi_{x} \cdot \phi(x)
+-\rho A\cdot\xi_{x+\Delta x} \cdot \phi(x+\Delta x)+\rho A\cdot\xi_{x} \cdot \phi(x)
 \end{equation}
-By using (\ref{displacement}) and $A=V/\Delta x$ we can write this as
+which by using (\ref{displacement}) becomes
 \begin{equation*}
-\rho v_x\Delta t\cdot V \frac{\phi (x)-\phi(x+\Delta x)}{\Delta x}
+-\rho A\cdot  v_{x+\Delta x}\cdot\Delta t \cdot \phi(x+\Delta x)+\rho A\cdot  v_{x}\cdot\Delta t \cdot \phi(x)
 \end{equation*}
-By letting $\Delta x\rightarrow 0$ we obtain
-\begin{equation*}
--\rho v_x\Delta t\cdot V \frac{\partial \phi}{\partial x}(x)
-\end{equation*}
-The same consideration can be done in $y$ and $z$ direction to obtain as net change of $phi$
-\begin{equation*}
-\rho V \Delta \phi = -\rho V \Delta t \left(v_x \frac{\partial \phi}{\partial x}+
- v_y \frac{\partial \phi}{\partial y}+
- +v_z \frac{\partial \phi}{\partial z}\right)
-\end{equation*}
-Dividing by $\rho V \Delta t$ and letting $\Delta t\rightarrow 0$, we obtain
-\begin{equation} \label{transp_equation}
-\frac{\partial\phi}{\partial t}=-\textbf{v}\cdot\nabla\phi
-\end{equation}
-
-We can now use this equation to express transport of heat-energy. Heat-energy and temperature are 
-related by $c_p T=u$ where $u$ denotes the inner energy. So what in fact is transported is $u$ and be inserting we get
-\begin{equation} \label{transp_heat}
-\frac{\partial T}{\partial t}=-\textbf{v}\cdot\nabla T
-\end{equation}
-As for the moment we can do similar considerations but things are little more involved since the velocity is transported so to say by itself. More in detail, when posing the net balance in (\ref{net_flow}) we instead have to take into account that the moved distance $\xi$ depends on its location. For the left surface we would have $\xi_{x}=v_{x}\Delta t$ and for the right one  $\xi_{x+\Delta x}=v_{x+\Delta x}\Delta t$. Putting this into equation yields
-\begin{equation*}
--\rho A\cdot v_{x+\Delta x}\cdot\Delta t \cdot \phi(x+\Delta x)+\rho A\cdot v_{x}\cdot\Delta t \cdot \phi(x)
-\end{equation*}
-We can apply a trick and rewrite this as
+By 'adding a zero' we can rewrite this as
 \begin{align*}
 &-\rho A\cdot v_{x+\Delta x}\cdot\Delta t \cdot \phi(x+\Delta x) \\ &+
 \rho A\cdot v_{x}\cdot\Delta t \cdot \phi(x+\Delta x) -
 \rho A\cdot v_{x}\cdot\Delta t \cdot \phi(x+\Delta x) \\ &+
 \rho A\cdot v_{x}\cdot\Delta t \cdot \phi(x)
 \end{align*}
-Further by putting terms together as
+Further by putting terms together yields
 \begin{align*}
-&\rho A\cdot (v_{x}-v_{x+\Delta x})\cdot\Delta t \cdot \phi(x+\Delta x) \\ &+
+&\rho A\cdot (v_{x}-v_{x+\Delta x})\cdot\Delta t \cdot \phi(x+\Delta x) +
 \rho A\cdot v_{x}\cdot\Delta t \cdot (\phi(x)-\phi(x+\Delta x))
 \end{align*}
-By doing analogous reformulation as done to obtain equation (\ref{transp_equation}) we arrive at
+By using $A=V/\Delta x$ we can write this as
+\begin{align*}
+&\rho V \frac{v_{x}-v_{x+\Delta x}}{\Delta x}\cdot\Delta t \cdot \phi(x+\Delta x) +
+\rho V v_{x}\cdot\Delta t\frac{\phi(x)-\phi(x+\Delta x)}{\Delta x}
+\end{align*}
+By letting $\Delta x\rightarrow 0$ we obtain
 \begin{equation*}
-\frac{\partial\phi}{\partial t}=-\textbf{v}\cdot\nabla\phi-\phi\nabla\cdot\textbf{v}
+-\rho \phi(x)\Delta t\cdot V\frac{\partial v_x}{\partial x}
+-\rho v_x\Delta t\cdot V \frac{\partial \phi}{\partial x}(x)
 \end{equation*}
-Note, since moment applies in all three directions we have to consider as $\phi$ all three components, $v_x, v_y, v_z$ of velocity. Hence we obtain the following system of equations
+The same consideration can be done in $y$ and $z$ direction and by adding all these net balances we obtain as net change of $phi$
 \begin{equation*}
-\frac{\partial\textbf{v}}{\partial t}=-\textbf{v}\cdot\nabla\textbf{v}-\textbf{v}(\nabla\cdot\textbf{v})
+\rho V \Delta \phi =
+-\rho V \Delta t\phi(x)\left(\frac{\partial v_x}{\partial x} 
++\frac{\partial v_y}{\partial y}+\frac{\partial v_z}{\partial z}\right)
+ -\rho V \Delta t \left(v_x \frac{\partial \phi}{\partial x}+
+ v_y \frac{\partial \phi}{\partial y}+
+ +v_z \frac{\partial \phi}{\partial z}\right)
 \end{equation*}
+Dividing by $\rho V \Delta t$ and letting $\Delta t\rightarrow 0$, we obtain
+\begin{equation} \label{transp_equation}
+\frac{\partial\phi}{\partial t}=-\phi\nabla\cdot\textbf{v} -\textbf{v}\cdot\nabla\phi
+\end{equation}
 Note, in very generic contexts one also takes the change of density into account, but here we will assume the density to be global constant.
 Also for our needs it will suffice to assume incrompressibility , that is, $\nabla\cdot\textbf{v}=0$. It expresses in essence that all mass flowing into the volume must flow out somewhere else.
-Out final equation for the moment becomes
-\begin{equation} \label{moment_transp_final}
+
+We can now use this equation to express transport of heat-energy. Heat-energy and temperature are 
+related by $c_p T=u$ where $u$ denotes the inner energy. So what in fact is transported is $u$ and be inserting we get
+\begin{equation} \label{transp_heat}
+\frac{\partial T}{\partial t}=-\textbf{v}\cdot\nabla T
+\end{equation}
+Since the moment applies into all three directions we have to consider as $\phi$ separately all components of velocity, $v_x, v_y, v_z$. This gives a set of three equation which we can write compactly as
+\begin{equation}
 \frac{\partial\textbf{v}}{\partial t}=-\textbf{v}\cdot\nabla\textbf{v}
 \end{equation}
 
 \subsection{Momentum Sources}
-The initial velocity is assumed to be 0 everywhere. For changes in moment due to Newton it requires a force. For simplification we assume the pressure is in so called static equilibrium.
-With these assumptions we can obtain at a force which is called buoyancy. It always arises when
+The initial velocity is assumed to be 0 everywhere. For changes in moment due to Newton it requires a force. For simplification we assume the pressure is in so called hydro-static equilibrium. As only remaining force we consider buoyancy. It always arises when
 a region of warmer fluid is surrounded by colder fluid. It only applies in vertical direction and
-can be formulated it terms of an acceleration as
+can be formulated in terms of an acceleration by
 \begin{equation}
 \textbf{F}_{B}=g\frac{T-T_{A}}{T_{A}}\textbf{e}_{z}
 \end{equation}
@@ -173,6 +169,8 @@ Our goal in this section is to provide a generic scheme for both mechanisms.
 Hereby we are going to consider both processes independent of each other and restrict
 attention to the 1-dimensional case. It will turn out later that this treatment is already
 sufficient for the final implementation.\\
+A small remark w.r.t our assumed incompressibility condition ($\nabla\cdot\textbf v=0$) must be
+maid. Actually after each time-iteration one must ensure these property to be withhold. Usually this is done by adjusting the pressure ('pressure correction'). To simplify things, we will neglect this and assume the pressure and the density to be global constants.
 
 \subsection{Derivative Approximations} \label{derivate_approx}
 The main method to obtain such approximations for derivatives is using Taylor expansion.
