@@ -5,7 +5,7 @@
 \contentsline {subsection}{\numberline {2.3}Momentum Sources}{5}{subsection.2.3}%
 \contentsline {subsection}{\numberline {2.4}Final Model}{5}{subsection.2.4}%
 \contentsline {section}{\numberline {3}Numerical Scheme}{5}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Derivative Approximations}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.1}Derivative Approximations}{5}{subsection.3.1}%
 \contentsline {subsection}{\numberline {3.2}Advection Scheme}{7}{subsection.3.2}%
 \contentsline {subsection}{\numberline {3.3}Diffusion Scheme}{7}{subsection.3.3}%
 \contentsline {subsection}{\numberline {3.4}Stability}{7}{subsection.3.4}%
