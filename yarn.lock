@@ -227,6 +227,11 @@
   resolved "https://registry.yarnpkg.com/@applied.math.coding/functional/-/functional-1.0.8.tgz#5425a797fe13b4713301051312b93a6a818a6da1"
   integrity sha512-7uudCH5bR9DTIg0lGgmyW5JM/oy6ZJZkxClsWiyXjUayp0ippTPcMdYXIDs1R/fLu6GFnFDT1HD07FBNMwhMGQ==
 
+"@applied.math.coding/lina@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@applied.math.coding/lina/-/lina-1.0.0.tgz#0451b89bc4659636f37ccc2fa575470f6ab3b0ee"
+  integrity sha512-ZCeKr2SXKJi0GwUpBE7z2rqByru5NGADkCr2s+ac2r8ZURys3WUHaId5Chfk5Xa6FfQ+jkS8MmNoeeWgh2SQrw==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.8.3":
   version "7.8.3"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.8.3.tgz#33e25903d7481181534e12ec0a25f16b6fcf419e"
@@ -6685,9 +6690,6 @@ lie@~3.3.0:
   integrity sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==
   dependencies:
     immediate "~3.0.5"
-
-"lina@file:.yalc/lina":
-  version "1.0.0-de224bce"
 
 loader-runner@^2.4.0:
   version "2.4.0"

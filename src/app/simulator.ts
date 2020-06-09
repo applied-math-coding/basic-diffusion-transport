@@ -1,4 +1,4 @@
-import { calc, Matrix, zeros, mat } from 'lina';
+import { calc, Matrix, zeros, mat } from '@applied.math.coding/lina';
 import { DynamicVars } from './dynamic-vars';
 import { Params } from './params';
 import { op } from '@applied.math.coding/functional';

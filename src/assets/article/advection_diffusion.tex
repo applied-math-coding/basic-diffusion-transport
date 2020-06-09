@@ -5,7 +5,7 @@
 \usepackage{graphicx}
 
 %opening
-\title{Implementing of a simple Heat-Convection Model}
+\title{Modeling and Implementing a simple Heat-Convection}
 \author{Florian Nikos Kitzka}
 
 \begin{document}
@@ -334,7 +334,7 @@ All this is due to an elegant trick referred as Operator and Term Splitting whic
 transport mechanism a scheme and then combine these schemes with each other.\\
 
 \subsubsection{Dimensional Split}
-Let us use the advection-scheme as explanatory example. Once understanding the idea, the reader easily can adapt the techniques to other schemes.\\
+Let us use the advection-scheme as explanatory example. Once understanding the idea, the techniques easily can be adapted to other schemes.
 We can write scheme (\ref{advection_scheme_upwind}) in an operator form
 \begin{equation*}
 L_{x} := id - c\Delta t \delta_{x}+S
@@ -360,12 +360,12 @@ In analogy we can define the operator $L_{y}$ which applies in $y$-direction
 \begin{equation*}
 L_{y}:=id - c\Delta t \delta_{y}+S
 \end{equation*}
-and compute the composition of both
+and build the composition of both
 \begin{equation} \label{L_x_comp_L_y}
 L_{x}\circ L_{y}=id-c\Delta t\delta_{x}-c\Delta t\delta_{y}+o(2)
 \end{equation}
-In the later we have skipped terms of order $2$ in $\Delta t$.
-The general advaction-process in dimension 2 has the form,
+In the later we have skipped terms of order $2$ in $\Delta t$. \\
+A general advaction-process in dimension 2 has the form,
 \begin{equation*}
 \frac{\partial u}{\partial t} = -c_{x}\frac{\partial u}{\partial x}-c_{y} \frac{\partial u}{\partial y}
 \end{equation*}
@@ -381,7 +381,7 @@ L_{x}\circ L_{y}(u_{i,j})=u_{i,j}^{n}-c_{x}\frac{\Delta t}{\Delta x}(u_{i,j}^{n}
 \end{equation*}
 and by comparing with (\ref{L_xy_scheme}) to see that the 2-dimensional scheme coincides 
 up to order 2 with the composition of the 1-dimensional scheme.\\
-Therefore, in our implementation instead of writing the scheme (\ref{L_xy_scheme}) we will first apply the advection scheme (\ref{advection_scheme_upwind}) for $x$-direction and on the result we will again apply (\ref{advection_scheme_upwind}) but in $y$-direction.
+Therefore, in our implementation instead of writing the scheme (\ref{L_xy_scheme}) we will first apply the advection scheme (\ref{advection_scheme_upwind}) for $x$-direction and on the result we will again apply (\ref{advection_scheme_upwind}) but for $y$-direction.
 
 \subsubsection{Term Splitting}
 The idea of term splitting is quite the same as for dimension splitting. But this times the split is done w.r.t different physical processes, that is diffusion and advection.\\
@@ -406,11 +406,11 @@ Again we can use the derivative approximations from section \ref{derivate_approx
 u_{i}^{n+1}=u_{i}^{n}-c\Delta t\delta_{x}(u_{i}^{n})+\alpha\Delta t\delta_{xx}(u_{i}^{n})
 \end{equation}
 We observe that the composition $L_{x}\circ L_{d}$ coincides up to order 2 with above scheme.\\
-So, in implementation instead of writing (\ref{diff_adv_scheme}) we will first apply $L_{d}$ and on the result $L_{x}$.
+In our implementation, instead of writing (\ref{diff_adv_scheme}), we will first apply $L_{d}$ and on the result $L_{x}$.
 
 \subsection{Final Scheme}
-In previous sections we were describing things a little bit more general than they actually are in our specific model. Since buoyancy only acts into $y$-direction we have only the $z$-component of velocity to have a positive value. Due to our specific boundary conditions we actually could model the entire system in 1-dimension but for educational reasons we do it in 2-dimensions.\\
-How final scheme can be written by using above operator expressions as
+In previous sections we were describing things a little bit more general than they actually are in our specific model. Since buoyancy acts into $z$-direction we have to take into account only the $z$-component of velocity. Due to our specific boundary conditions we actually could model the entire system in 1-dimension but for educational reasons we do it in 2-dimensions.\\
+The final scheme can be written by using above operator expressions as
 \begin{equation} \label{final_scheme_expr}
 u_{i,j}^{n+1}=L_{x}\circ L_{D,y}\circ L_{D,x}(u_{i,j}^{n})
 \end{equation}
@@ -418,11 +418,11 @@ $L_{D,x}$, $L_{D,y}$ denote the 1-dimensional diffusion operators applied in $x$
 This is an explicit scheme which becomes very handy to implement in this form as we will see next.
 
 \section{Implementation}
-This section will explain the important snippets of code which can be found at \url{https://github.com/applied-math-coding/basic-diffusion-transport}. \\
-Implementation is provided in Typescript (by utilizing the package [TODO lina]) and in Python.
+The entire implementation as available at: \\ \url{https://github.com/applied-math-coding/basic-diffusion-transport}.\\
+The code is written in Typescript (by utilizing the package \cite{lina}) and another version in Python.
 An online running example can be found here,\\
- \url{https://applied-math-coding.github.io/basic-diffusion-transport/}.
-We will give detailed explanations for the Python code only. The Typescript code is similar structured and due to the use of [TODO lina] operator implementation are quite straight forward.\\
+ \url{https://applied-math-coding.github.io/basic-diffusion-transport/}.\\
+In the following we will give explanations for the Python code by focusing on the important snippets. The Typescript code is similar structured and due to the use of \cite{lina} operator implementation are quite similar.\\
 
 Model parameter are defined in the file 'params.py'.
 We initialize the temperature and velocity field by using three matrices. Note, the matrices
@@ -434,7 +434,7 @@ v_y = np.zeros((params.n_grid, params.n_grid))
 v_x = np.zeros((params.n_grid, params.n_grid))
 \end{lstlisting}
 
-We iterate the application of all operators and ensure the results are directly written
+We iterate the application of operators and directly write the result
 into above matrices:
 \begin{lstlisting}[language=Python]
 def simulate():
@@ -463,8 +463,8 @@ def adjust_boundary(T, v_x, v_y):
   v_y[:, -1] = v_y[:, -2]
 \end{lstlisting}
 
-In order to implement the operators, instead of using loops we are element-wise combining (adding, ...) matrices which indexes are shifted correspondingly in order to achieve the 
-specific schemes receipt (note how much the implementation resembles the actual scheme's definition):
+In order to implement the operators, instead of using loops we are element-wise combining (adding, ...) sub-matrices (slices). The indexes of these sub-matrices are shifted against each other in order to achieve the 
+specific schemes receipt. This way the implementation is quite optimized and moreover resembles the actual scheme's definition:
 \begin{lstlisting}[language=Python]
 def diffusion_x_op(T, alpha, delta_t, delta_x):
   T[1:-1, 1:-1] = T[1:-1, 1:-1] + alpha * delta_t / \
@@ -500,11 +500,19 @@ def mom_convection_y_op(T, v_y, delta_t, delta_x):
 \end{lstlisting}
 \noindent
 All code provided in this section is not intended for use in production environments. It is aimed for educational purposes only. For any mistakes the author does not take any responsibilities.
-
+\newpage
 \section{Further Reading}
-This article intends to give an introduction into all treated areas.
+This article intended to give an introduction into all treated areas.
 There are many good books or online tutorials about numeric of partial
 differential equations. Or if you are more specialized on fluid dynamics you will find
-many good accounts on this field too. Please feel encouraged to clone the entire project from
+many good accounts on this field either. Please feel encouraged to clone the entire project from
 \url{https://github.com/applied-math-coding/basic-diffusion-transport} and to extend or play around.
+
+\begin{thebibliography}{9}
+	\bibitem{lina} 
+	applied.math.coding
+	\url{https://www.npmjs.com/package/@applied.math.coding/lina}
+\end{thebibliography}
+
+
 \end{document}

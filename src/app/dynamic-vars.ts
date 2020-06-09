@@ -1,4 +1,4 @@
-import { Matrix } from 'lina';
+import { Matrix } from '@applied.math.coding/lina';
 
 export class DynamicVars{
   T: Matrix;
